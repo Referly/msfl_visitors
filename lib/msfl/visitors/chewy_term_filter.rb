@@ -14,6 +14,10 @@ module MSFL
         collector << obj.value
       end
 
+      def visit_MSFL_Nodes_Time(obj, collector)
+        collector << obj.value.iso8601
+      end
+
       def visit_MSFL_Nodes_Word(obj, collector)
         collector << "#{obj.value.to_s}"
       end

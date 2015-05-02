@@ -53,4 +53,17 @@ describe MSFL::Visitors::ChewyTermFilter do
       end
     end
   end
+
+  describe "#visit_MSFL_Nodes_Time" do
+
+    subject { test_instance.visit_MSFL_Nodes_Time node, collector }
+
+    let(:node) { MSFL::Nodes::Time.new current_time }
+
+    let(:current_time) { Time.now }
+
+    it "is the current time using iso8601 formatting" do
+      expect(subject.first).to eq current_time.iso8601
+    end
+  end
 end
