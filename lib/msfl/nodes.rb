@@ -1,4 +1,5 @@
 # Using alphabetical order to keep these organized
+require_relative 'nodes/boolean'
 require_relative 'nodes/date'
 require_relative 'nodes/date_time'
 require_relative 'nodes/number'

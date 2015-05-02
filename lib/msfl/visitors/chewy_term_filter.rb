@@ -2,6 +2,10 @@ module MSFL
   module Visitors
     class ChewyTermFilter < Base
 
+      def visit_MSFL_Nodes_Boolean(obj, collector)
+        collector << obj.value
+      end
+
       def visit_MSFL_Nodes_Date(obj, collector)
         collector << obj.value.iso8601
       end
