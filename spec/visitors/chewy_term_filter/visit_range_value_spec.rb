@@ -8,17 +8,6 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   let(:test_instance) { described_class.new }
 
-  describe "#visit_MSFL_Nodes_Word" do
-
-    subject { test_instance.visit_MSFL_Nodes_Word node, collector }
-
-    let(:node) { MSFL::Nodes::Word.new "node_content" }
-
-    it "is a literal string" do
-      expect(subject.first).to match /node_content/
-    end
-  end
-
   describe "#visit_MSFL_Nodes_Date" do
 
     subject { test_instance.visit_MSFL_Nodes_Date node, collector }
