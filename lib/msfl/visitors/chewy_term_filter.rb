@@ -3,7 +3,11 @@ module MSFL
     class ChewyTermFilter < Base
 
       # Instead of using string interpolation only supported operators are enabled
-      COMPARISON_OPERATORS = { eq: "==", gt: ">", gte: ">=", lt: "<", lte: "<=" }
+      BINARY_OPERATORS = { eq: "==", gt: ">", gte: ">=", lt: "<", lte: "<=", and: "&" }
+
+      def visit_MSFL_Nodes_And(obj, collector)
+        binary_helper :and, collector
+      end
 
       def visit_MSFL_Nodes_Boolean(obj, collector)
         collector << obj.value
@@ -17,24 +21,32 @@ module MSFL
         collector << obj.value.iso8601
       end
 
-      def visit_MSFL_Nodes_Equal(obj, collector, suppress_parens = false)
-        comparison_helper :eq, obj, collector, suppress_parens
+      def visit_MSFL_Nodes_Equal(obj, collector)
+        binary_helper :eq, collector
       end
 
-      def visit_MSFL_Nodes_GreaterThan(obj, collector, suppress_parens = false)
-        comparison_helper :gt, obj, collector, suppress_parens
+      def visit_MSFL_Nodes_GreaterThan(obj, collector)
+        binary_helper :gt, collector
       end
 
-      def visit_MSFL_Nodes_GreaterThanEqual(obj, collector, suppress_parens = false)
-        comparison_helper :gte, obj, collector, suppress_parens
+      def visit_MSFL_Nodes_GreaterThanEqual(obj, collector)
+        binary_helper :gte, collector
       end
 
-      def visit_MSFL_Nodes_LessThan(obj, collector, suppress_parens = false)
-        comparison_helper :lt, obj, collector, suppress_parens
+      def visit_MSFL_Nodes_Grouping_Close(obj, collector)
+        collector << " )"
       end
 
-      def visit_MSFL_Nodes_LessThanEqual(obj, collector, suppress_parens = false)
-        comparison_helper :lte, obj, collector, suppress_parens
+      def visit_MSFL_Nodes_Grouping_Open(obj, collector)
+        collector << "( "
+      end
+
+      def visit_MSFL_Nodes_LessThan(obj, collector)
+        binary_helper :lt, collector
+      end
+
+      def visit_MSFL_Nodes_LessThanEqual(obj, collector)
+        binary_helper :lte, collector
       end
 
       def visit_MSFL_Nodes_Number(obj, collector)
@@ -50,17 +62,8 @@ module MSFL
       end
 
     private
-      def comparison_helper(operator, obj, collector, suppress_parens = false)
-        unless suppress_parens
-          collector << "( "
-        end
-        collector = visit obj.left, collector
-        collector << " #{COMPARISON_OPERATORS.fetch(operator.to_sym)} "
-        collector = visit obj.right, collector
-        unless suppress_parens
-          collector << " )"
-        end
-        collector
+      def binary_helper(operator, collector)
+        collector << " #{BINARY_OPERATORS.fetch(operator.to_sym)} "
       end
     end
   end
