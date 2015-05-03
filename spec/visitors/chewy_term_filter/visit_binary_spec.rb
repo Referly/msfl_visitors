@@ -14,7 +14,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   let(:right) { MSFL::Nodes::Word.new "rhs" }
 
-  describe "#visit_MSFL_Nodes_And" do
+  describe "visiting an And node" do
 
     let(:node) { MSFL::Nodes::And.new left, right }
 
