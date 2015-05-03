@@ -2,15 +2,15 @@ require 'spec_helper'
 
 describe MSFL::Visitors::ChewyTermFilter do
 
-  let(:collector) { Array.new }
+  subject { node.accept visitor }
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  let(:test_instance) { described_class.new }
+  let(:visitor) { described_class.new collector }
 
-  describe "#visit_MSFL_Nodes_Boolean" do
+  let(:collector) { Array.new }
 
-    subject { test_instance.visit_MSFL_Nodes_Boolean node, collector }
+  describe "visiting a Boolean node" do
 
     let(:node) { MSFL::Nodes::Boolean.new value }
 
@@ -33,9 +33,7 @@ describe MSFL::Visitors::ChewyTermFilter do
     end
   end
 
-  describe "#visit_MSFL_Nodes_Word" do
-
-    subject { test_instance.visit_MSFL_Nodes_Word node, collector }
+  describe "visiting a Word node" do
 
     let(:node) { MSFL::Nodes::Word.new "node_content" }
 
