@@ -2,15 +2,15 @@ require 'spec_helper'
 
 describe MSFL::Visitors::ChewyTermFilter do
 
-  let(:collector) { Array.new }
+  subject { node.accept visitor }
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  let(:test_instance) { described_class.new }
+  let(:visitor) { described_class.new collector }
 
-  describe "#visit_MSFL_Nodes_Date" do
+  let(:collector) { Array.new }
 
-    subject { test_instance.visit_MSFL_Nodes_Date node, collector }
+  describe "visiting a Date node" do
 
     let(:node) { MSFL::Nodes::Date.new Date.today }
 
@@ -19,9 +19,7 @@ describe MSFL::Visitors::ChewyTermFilter do
     end
   end
 
-  describe "#visit_MSFL_Nodes_DateTime" do
-
-    subject { test_instance.visit_MSFL_Nodes_DateTime node, collector }
+  describe "visiting a DateTime node" do
 
     let(:now) { DateTime.now }
 
@@ -32,9 +30,7 @@ describe MSFL::Visitors::ChewyTermFilter do
     end
   end
 
-  describe "#visit_MSFL_Nodes_Number" do
-
-    subject { test_instance.visit_MSFL_Nodes_Number node, collector }
+  describe "visiting a Number node" do
 
     let(:node) { MSFL::Nodes::Number.new number }
 
@@ -54,9 +50,7 @@ describe MSFL::Visitors::ChewyTermFilter do
     end
   end
 
-  describe "#visit_MSFL_Nodes_Time" do
-
-    subject { test_instance.visit_MSFL_Nodes_Time node, collector }
+  describe "visiting a Time node" do
 
     let(:node) { MSFL::Nodes::Time.new current_time }
 
