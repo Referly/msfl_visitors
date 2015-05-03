@@ -1,6 +1,7 @@
+require_relative 'base'
 module MSFL
   module Nodes
-    class Value
+    class Value < Base
 
       attr_accessor :value
 
