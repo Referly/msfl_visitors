@@ -1,7 +1,9 @@
+require 'msfl'
 module MSFLVisitors
   module Parsers
     class MSFLParser
       include MSFL::Validators::Definitions::HashKey
+
       def parse(obj, lhs = false)
         send("parse_#{obj.class.to_s.gsub('::', '_')}", obj, lhs)
       end
@@ -19,7 +21,7 @@ module MSFLVisitors
       end
 
       def parse_String(obj, lhs = false)
-
+        MSFLVisitors::Nodes::Word.new obj
       end
 
       def parse_MSFL_Types_Set(obj, lhs = false)

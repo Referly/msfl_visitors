@@ -12,6 +12,11 @@ module MSFLVisitors
       def initialize(expr)
         self.value = expr
       end
+
+      def ==(other)
+        self.class == other.class &&
+          value == other.value
+      end
     end
   end
 end

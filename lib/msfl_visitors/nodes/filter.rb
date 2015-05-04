@@ -13,6 +13,11 @@ module MSFLVisitors
       def initialize(nodes)
         self.contents = nodes
       end
+
+      def ==(other)
+        self.class == other.class &&
+            contents == other.contents
+      end
     end
   end
 end
