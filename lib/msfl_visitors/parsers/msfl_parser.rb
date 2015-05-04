@@ -1,7 +1,7 @@
 module MSFLVisitors
   module Parsers
     class MSFLParser
-      include MSFL::Validators::Definitions::HashKey
+      # include MSFL::Validators::Definitions::HashKey
       def parse(obj, lhs = false)
         send("parse_#{obj.class.to_s.gsub('::', '_')}", obj, lhs)
       end
