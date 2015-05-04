@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'msfl-visitors'
+  s.name        = 'msfl_visitors'
   s.version     = '0.0.1'
   s.date        = '2015-05-01'
   s.summary     = "Convert MSFL to other forms"
@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.homepage    =
-      'https://github.com/Referly/msfl-visitors'
+      'https://github.com/Referly/msfl_visitors'
   # s.add_runtime_dependency "json", "~> 1.7"
   # s.add_development_dependency "rake", "~> 10.3"
   # s.add_development_dependency "simplecov", "~> 0.9"
