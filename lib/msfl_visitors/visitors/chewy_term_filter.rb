@@ -3,8 +3,12 @@ module MSFLVisitors
     class ChewyTermFilter < Base
 
       def render(obj)
-        Renderers.wrap_node(obj).render
+        renderer.render(obj)
       end
+
+      private
+
+      attr_reader :renderer
     end
   end
 end
