@@ -1,8 +1,8 @@
 require_relative '../constant_value'
-module MSFL
+module MSFLVisitors
   module Nodes
     module Grouping
-      class Open < ConstantValue
+      class Close < ConstantValue
       end
     end
   end

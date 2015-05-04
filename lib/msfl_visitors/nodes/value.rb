@@ -1,5 +1,5 @@
 require_relative 'base'
-module MSFL
+module MSFLVisitors
   module Nodes
     class Value < Base
 

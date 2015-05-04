@@ -1,7 +1,7 @@
 require_relative 'range_value'
-module MSFL
+module MSFLVisitors
   module Nodes
-    class Number < RangeValue
+    class Time < RangeValue
     end
   end
 end

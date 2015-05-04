@@ -1,6 +1,6 @@
 require_relative 'close'
 require_relative 'open'
-module MSFL
+module MSFLVisitors
   module Nodes
     module Grouping
       class Grouping

@@ -1,4 +1,4 @@
-module MSFL
+module MSFLVisitors
   module Visitors
     class Base
       attr_accessor :collector

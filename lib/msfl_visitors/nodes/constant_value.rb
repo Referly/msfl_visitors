@@ -1,6 +1,7 @@
-module MSFL
+require_relative 'base'
+module MSFLVisitors
   module Nodes
-    class ConstantValue
+    class ConstantValue < Base
 
       def accept(visitor)
         visitor.visit self

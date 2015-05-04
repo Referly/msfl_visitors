@@ -1,4 +1,4 @@
-module MSFL
+module MSFLVisitors
   module Nodes
     class Base
 

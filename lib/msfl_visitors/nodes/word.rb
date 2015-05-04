@@ -1,7 +1,7 @@
 require_relative 'value'
-module MSFL
+module MSFLVisitors
   module Nodes
-    class RangeValue < Value
+    class Word < Value
     end
   end
 end

@@ -1,5 +1,5 @@
 require_relative 'range_value'
-module MSFL
+module MSFLVisitors
   module Nodes
     class DateTime < RangeValue
     end

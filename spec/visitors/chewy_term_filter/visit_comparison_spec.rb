@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MSFL::Visitors::ChewyTermFilter do
+describe MSFLVisitors::Visitors::ChewyTermFilter do
 
   subject { node.accept visitor }
 
@@ -10,13 +10,13 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   let(:collector) { String.new }
 
-  let(:left) { MSFL::Nodes::Word.new "lhs" }
+  let(:left) { MSFLVisitors::Nodes::Word.new "lhs" }
 
-  let(:right) { MSFL::Nodes::Word.new "rhs" }
+  let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
   describe "visiting an Equal node" do
 
-    let(:node) { MSFL::Nodes::Equal.new left, right }
+    let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
 
     it "matches left == right" do
       expect(subject).to match "lhs == rhs"
@@ -25,7 +25,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a GreaterThan node" do
 
-    let(:node) { MSFL::Nodes::GreaterThan.new left, right }
+    let(:node) { MSFLVisitors::Nodes::GreaterThan.new left, right }
 
     it "matches left > right" do
       expect(subject).to match "lhs > rhs"
@@ -34,7 +34,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a GreaterThanEqual node" do
 
-    let(:node) { MSFL::Nodes::GreaterThanEqual.new left, right }
+    let(:node) { MSFLVisitors::Nodes::GreaterThanEqual.new left, right }
 
     it "matches left >= right" do
       expect(subject).to match "lhs >= rhs"
@@ -43,7 +43,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a LessThan node" do
 
-    let(:node) { MSFL::Nodes::LessThan.new left, right }
+    let(:node) { MSFLVisitors::Nodes::LessThan.new left, right }
 
     it "matches left < right" do
       expect(subject).to match "lhs < rhs"
@@ -52,7 +52,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a LessThanEqual node" do
 
-    let(:node) { MSFL::Nodes::LessThanEqual.new left, right }
+    let(:node) { MSFLVisitors::Nodes::LessThanEqual.new left, right }
 
     it "matches left <= right" do
       expect(subject).to match "lhs <= rhs"

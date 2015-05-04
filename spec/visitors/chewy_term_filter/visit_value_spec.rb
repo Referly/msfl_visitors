@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MSFL::Visitors::ChewyTermFilter do
+describe MSFLVisitors::Visitors::ChewyTermFilter do
 
   subject { node.accept visitor }
 
@@ -12,7 +12,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a Boolean node" do
 
-    let(:node) { MSFL::Nodes::Boolean.new value }
+    let(:node) { MSFLVisitors::Nodes::Boolean.new value }
 
     context "when the node has a value of true" do
 
@@ -35,7 +35,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a Word node" do
 
-    let(:node) { MSFL::Nodes::Word.new "node_content" }
+    let(:node) { MSFLVisitors::Nodes::Word.new "node_content" }
 
     it "is a literal string" do
       expect(subject.first).to match /node_content/

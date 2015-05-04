@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MSFL::Visitors::ChewyTermFilter do
+describe MSFLVisitors::Visitors::ChewyTermFilter do
 
   subject { node.accept visitor }
 
@@ -12,7 +12,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a Date node" do
 
-    let(:node) { MSFL::Nodes::Date.new Date.today }
+    let(:node) { MSFLVisitors::Nodes::Date.new Date.today }
 
     it "is today's date using iso8601 formatting" do
       expect(subject.first).to eq Date.today.iso8601
@@ -23,7 +23,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
     let(:now) { DateTime.now }
 
-    let(:node) { MSFL::Nodes::DateTime.new now }
+    let(:node) { MSFLVisitors::Nodes::DateTime.new now }
 
     it "is the current date and time using iso8601 formatting" do
       expect(subject.first).to eq now.iso8601
@@ -32,7 +32,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a Number node" do
 
-    let(:node) { MSFL::Nodes::Number.new number }
+    let(:node) { MSFLVisitors::Nodes::Number.new number }
 
     let(:number) { 123 }
 
@@ -52,7 +52,7 @@ describe MSFL::Visitors::ChewyTermFilter do
 
   describe "visiting a Time node" do
 
-    let(:node) { MSFL::Nodes::Time.new current_time }
+    let(:node) { MSFLVisitors::Nodes::Time.new current_time }
 
     let(:current_time) { Time.now }
 

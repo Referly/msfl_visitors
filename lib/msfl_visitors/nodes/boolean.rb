@@ -1,5 +1,5 @@
 require_relative 'value'
-module MSFL
+module MSFLVisitors
   module Nodes
     class Boolean < Value
     end
