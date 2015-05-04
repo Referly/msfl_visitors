@@ -4,7 +4,7 @@ module MSFLVisitors
       attr_accessor :collector
 
       def visit(obj)
-        send("visit_#{obj.class.to_s.gsub('::', '_')}", obj, collector)
+        collector << obj.collect_value
       end
 
       def initialize(collector)

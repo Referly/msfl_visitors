@@ -21,5 +21,16 @@ require_relative 'nodes/time'
 require_relative 'nodes/value'
 require_relative 'nodes/word'
 
-
-
+module MSFLVisitors
+  module Nodes
+    # Instead of using string interpolation only supported operators are enabled
+    BINARY_OPERATORS = {
+      Equal => " == ",
+      GreaterThan => " > ",
+      GreaterThanEqual => " >= ",
+      LessThan => " < ",
+      LessThanEqual => " <= ",
+      And => " & ",
+    }
+  end
+end
