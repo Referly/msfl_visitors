@@ -1,9 +1,10 @@
+require_relative '../base'
 require_relative 'close'
 require_relative 'open'
 module MSFLVisitors
   module Nodes
     module Grouping
-      class Grouping
+      class Grouping < Base
 
         attr_accessor :contents
 
