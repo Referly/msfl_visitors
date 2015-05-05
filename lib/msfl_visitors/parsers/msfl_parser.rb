@@ -5,8 +5,30 @@ module MSFLVisitors
       include MSFL::Validators::Definitions::HashKey
 
       def parse(obj, lhs = false)
-        send("parse_#{obj.class.to_s.gsub('::', '_')}", obj, lhs)
+        # send("parse_#{obj.class.to_s.gsub('::', '_')}", obj, lhs)
+        case obj
+
+          when Float, Fixnum
+            MSFLVisitors::Nodes::Number.new obj
+
+          when Hash
+            parse_Hash obj, lhs
+
+          when MSFL::Types::Set
+            parse_Set obj, lhs
+
+          when Symbol, String, NilClass
+            MSFLVisitors::Nodes::Word.new obj.to_s
+
+          else
+            fail ArgumentError, "Invalid NMSFL, unable to parse."
+        end
       end
+
+
+
+
+    private
 
       def parse_Hash(obj, lhs = false)
         nodes = Array.new
@@ -16,23 +38,9 @@ module MSFLVisitors
         MSFLVisitors::Nodes::Filter.new nodes
       end
 
-      def parse_Symbol(obj, lhs = false)
+      def parse_Set(obj, lhs = false)
 
       end
-
-      def parse_String(obj, lhs = false)
-        MSFLVisitors::Nodes::Word.new obj
-      end
-
-      def parse_MSFL_Types_Set(obj, lhs = false)
-
-      end
-
-      def parse_NilClass(obj, lhs = false)
-
-      end
-
-    private
 
       def hash_dispatch(key, value, lhs = false)
         if hash_key_operators.include? key
