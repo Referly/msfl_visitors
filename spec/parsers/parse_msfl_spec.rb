@@ -11,7 +11,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
      let(:expected) { MSFLVisitors::Nodes::Filter.new [ MSFLVisitors::Nodes::Equal.new(left, right) ] }
 
-     let(:left) { MSFLVisitors::Nodes::Word.new :make }
+     let(:left) { MSFLVisitors::Nodes::Field.new :make }
 
      let(:right) { MSFLVisitors::Nodes::Word.new "Ferrari" }
 

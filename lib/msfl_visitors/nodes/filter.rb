@@ -6,12 +6,14 @@ module MSFLVisitors
       attr_accessor :contents
 
       def accept(visitor)
-        contents.accept visitor
+        contents.each do |item|
+          item.accept visitor
+        end
       end
 
       # @param nodes [Array<MSFL::Nodes::Base>] the nodes that the filter surrounds
       def initialize(nodes)
-        self.contents = nodes
+        self.contents = Array(nodes)
       end
 
       def ==(other)

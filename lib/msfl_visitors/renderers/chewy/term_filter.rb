@@ -23,8 +23,11 @@ module MSFLVisitors
           when Nodes::Boolean, Nodes::Number
             node.value
 
-          when Nodes::Word
+          when Nodes::Field
             node.value.to_s
+
+          when Nodes::Word
+            %("#{node.value.to_s}")
 
           when Nodes::Grouping::Close
             ' )'

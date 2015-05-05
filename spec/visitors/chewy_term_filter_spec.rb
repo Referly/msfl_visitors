@@ -10,7 +10,7 @@ describe MSFLVisitors::Visitor do
 
   let(:visitor) { described_class.new collector, renderer }
 
-  let(:left) { MSFLVisitors::Nodes::Word.new "lhs" }
+  let(:left) { MSFLVisitors::Nodes::Field.new "lhs" }
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
@@ -23,7 +23,7 @@ describe MSFLVisitors::Visitor do
       let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
 
       it "results in: 'left == right'" do
-        expect(result).to eq "lhs == rhs"
+        expect(result).to eq "lhs == \"rhs\""
       end
     end
 
@@ -32,7 +32,7 @@ describe MSFLVisitors::Visitor do
       let(:node) { MSFLVisitors::Nodes::GreaterThan.new left, right }
 
       it "returns: 'left > right'" do
-        expect(result).to eq "lhs > rhs"
+        expect(result).to eq "lhs > \"rhs\""
       end
     end
 
@@ -41,7 +41,7 @@ describe MSFLVisitors::Visitor do
       let(:node) { MSFLVisitors::Nodes::GreaterThanEqual.new left, right }
 
       it "returns: 'left >= right'" do
-        expect(result).to eq "lhs >= rhs"
+        expect(result).to eq "lhs >= \"rhs\""
       end
     end
 
@@ -50,7 +50,7 @@ describe MSFLVisitors::Visitor do
       let(:node) { MSFLVisitors::Nodes::LessThan.new left, right }
 
       it "returns: 'left < right'" do
-        expect(result).to eq "lhs < rhs"
+        expect(result).to eq 'lhs < "rhs"'
       end
     end
 
@@ -59,7 +59,7 @@ describe MSFLVisitors::Visitor do
       let(:node) { MSFLVisitors::Nodes::LessThanEqual.new left, right }
 
       it "returns: 'left <= right'" do
-        expect(result).to eq "lhs <= rhs"
+        expect(result).to eq 'lhs <= "rhs"'
       end
     end
 
@@ -67,8 +67,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::And.new left, right }
 
-      it "returns: '( left ) & ( right )'" do
-        expect(result).to eq "( lhs ) & ( rhs )"
+      xit "returns: '( left ) & ( right )'" do
+        expect(result).to eq '( left == "lhs" ) & ( right == "rhs" )'
       end
     end
 
@@ -106,8 +106,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Word.new word }
 
-        it "is a literal string" do
-          expect(result).to eq word
+        it "is a double quoted literal string" do
+          expect(result).to eq "\"#{word}\""
         end
       end
     end
