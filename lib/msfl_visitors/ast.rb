@@ -4,7 +4,7 @@ module MSFLVisitors
     attr_accessor :root
 
     def initialize(msfl)
-      self.root = MSFLVisitors::Parsers::MSFLParser.parse msfl
+      self.root = MSFLVisitors::Parsers::MSFLParser.new.parse msfl
     end
 
     # Use this method to walk the AST with a particular visitor
