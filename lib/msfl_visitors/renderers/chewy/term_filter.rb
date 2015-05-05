@@ -3,7 +3,6 @@ module MSFLVisitors
     module Chewy
       class TermFilter
         BINARY_OPERATORS = {
-          Nodes::And              => ' & ',
           Nodes::GreaterThan      => ' > ',
           Nodes::LessThan         => ' < ',
           Nodes::GreaterThanEqual => ' >= ',
@@ -11,11 +10,18 @@ module MSFLVisitors
           Nodes::Equal            => ' == ',
         }
 
+        ITERATIVE_OPERATORS = {
+            Nodes::And            => ' & ',
+        }
+
         def render(node)
           case node
 
-          when Nodes::Comparison, Nodes::And
+          when Nodes::Comparison
             BINARY_OPERATORS[node.class]
+
+          when Nodes::Iterator
+            ITERATIVE_OPERATORS[node.class]
 
           when Nodes::Date, Nodes::Time
             node.value.iso8601

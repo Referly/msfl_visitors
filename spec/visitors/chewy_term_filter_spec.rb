@@ -14,7 +14,7 @@ describe MSFLVisitors::Visitor do
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { node.accept visitor }
+  subject(:result) { node.accept visitor; collector }
 
   context "when visiting" do
 
@@ -65,10 +65,57 @@ describe MSFLVisitors::Visitor do
 
     describe "an And node" do
 
-      let(:node) { MSFLVisitors::Nodes::And.new left, right }
+      let(:first_field) { MSFLVisitors::Nodes::Field.new "first_field" }
 
-      xit "returns: '( left ) & ( right )'" do
-        expect(result).to eq '( left == "lhs" ) & ( right == "rhs" )'
+      let(:first_value) { MSFLVisitors::Nodes::Word.new "first_word" }
+
+      let(:first) { MSFLVisitors::Nodes::Equal.new(first_field, first_value) }
+
+      let(:second_field) { MSFLVisitors::Nodes::Field.new "second_field" }
+
+      let(:second_value) { MSFLVisitors::Nodes::Word.new "second_word" }
+
+      let(:second) { MSFLVisitors::Nodes::Equal.new(second_field, second_value) }
+
+      let(:third_field) { MSFLVisitors::Nodes::Field.new "third_field" }
+
+      let(:third_value) { MSFLVisitors::Nodes::Word.new "third_word" }
+
+      let(:third) { MSFLVisitors::Nodes::Equal.new(third_field, third_value) }
+
+      context "when the And node has zero items" do
+        let(:node) { MSFLVisitors::Nodes::And.new([]) }
+
+        it "is empty" do
+          expect(result).to be_empty
+        end
+      end
+
+      context "when the node has one item" do
+
+        let(:node) { MSFLVisitors::Nodes::And.new([first])}
+
+        it "returns: the item without adding parentheses" do
+          expect(result).to eq 'first_field == "first_word"'
+        end
+      end
+
+      context "when the node has two items" do
+
+        let(:node) { MSFLVisitors::Nodes::And.new([first, second]) }
+
+        it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" )'" do
+          expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" )'
+        end
+      end
+
+      context "when the node has three items" do
+
+        let(:node) { MSFLVisitors::Nodes::And.new([first, second, third]) }
+
+        it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )'" do
+          expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )'
+        end
       end
     end
 
