@@ -2,18 +2,18 @@ module MSFLVisitors
   module Visitors
     class Base
 
-      def initialize(collector, renderer=Renderers::ChewyRenderer)
+      def initialize(collector, renderer)
         @collector = collector
-        @renderer = renderer.new
+        @renderer = renderer
       end
 
       def visit(obj)
-        collector << render(obj)
+        collector << renderer.render(obj)
       end
 
       private
 
-      attr_reader :collector
+      attr_reader :collector, :renderer
     end
   end
 end

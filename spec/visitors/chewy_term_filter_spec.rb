@@ -4,9 +4,11 @@ describe MSFLVisitors::Visitors::ChewyTermFilter do
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  let(:visitor) { described_class.new collector }
-
   let(:collector) { String.new }
+
+  let(:renderer) { MSFLVisitors::Renderers::ChewyRenderer.new }
+
+  let(:visitor) { described_class.new collector, renderer }
 
   let(:left) { MSFLVisitors::Nodes::Word.new "lhs" }
 
