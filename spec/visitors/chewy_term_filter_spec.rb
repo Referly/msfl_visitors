@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MSFLVisitors::Visitors::ChewyTermFilter do
+describe MSFLVisitors::Visitor do
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
