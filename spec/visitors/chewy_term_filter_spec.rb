@@ -6,7 +6,7 @@ describe MSFLVisitors::Visitor do
 
   let(:collector) { String.new }
 
-  let(:renderer) { MSFLVisitors::Renderers::ChewyRenderer.new }
+  let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
 
   let(:visitor) { described_class.new collector, renderer }
 
