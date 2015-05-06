@@ -7,24 +7,21 @@ module MSFLVisitors
         attr_accessor :contents
 
         def accept(visitor)
-          # I've basically used this same iteration logic here and in Nodes::And
-          # 1. It could be deduplicated
-          # 2. It's rather unrubyish - despite not using a loop explicitly that's basically what's happening
-          Open.new.accept visitor
-          contents.inject(1) do |iteration, item|
-            if iteration < contents.count
-              if iteration > 1
-                Delimiter.new.accept visitor
-              end
-              item.accept visitor
+          nodes = Array.new
+          nodes << Open.new
+          if contents.count > 0
+            contents.each do |item|
+              nodes << item
+              nodes << Delimiter.new
             end
-            iteration + 1
+            # Remove the last (and therefore extra) delimiter
+            nodes.pop
           end
-          if contents.count > 1
-            Delimiter.new.accept visitor
+          nodes << Close.new
+
+          nodes.each do |node|
+            node.accept visitor
           end
-          contents.last.accept visitor
-          Close.new.accept visitor
         end
 
         # @param nodes [Array<MSFL::Nodes::Base>] the nodes that the filter surrounds
