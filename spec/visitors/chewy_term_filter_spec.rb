@@ -14,7 +14,9 @@ describe MSFLVisitors::Visitor do
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { node.accept visitor; collector }
+  subject(:result) { collector }
+
+  before(:each) { node.accept visitor }
 
   context "when visiting" do
 
