@@ -2,6 +2,7 @@
 require_relative 'nodes/and'
 require_relative 'nodes/base'
 require_relative 'nodes/binary'
+require_relative 'nodes/binary_and'
 require_relative 'nodes/boolean'
 require_relative 'nodes/comparison'
 require_relative 'nodes/constant_value'
