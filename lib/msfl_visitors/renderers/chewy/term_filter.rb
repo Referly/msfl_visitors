@@ -41,6 +41,12 @@ module MSFLVisitors
           when Nodes::Grouping::Open
             '( '
 
+          when Nodes::Set::Close
+            ' ]'
+
+          when Nodes::Set::Open
+            '[ '
+
           else
             fail ArgumentError.new("Unrecognized node type: #{node.class}")
           end

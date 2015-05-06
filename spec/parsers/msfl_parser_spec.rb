@@ -30,16 +30,32 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       let(:explicit_gte_filter) { { value: { gte: 1000 } } }
 
+      let(:containment_filter) { { value: { in: containment_values } } }
+
+      let(:containment_values) { MSFL::Types::Set.new [50, 250, 20000] }
+
       it "handles implicit equality comparisons" do
         expect(subject.call(implicit_equality_filter)).to eq expected_node.call(MSFLVisitors::Nodes::Equal.new(left, right))
       end
 
       it "handles explicit comparisons" do
-        comparison_node = MSFLVisitors::Nodes::GreaterThanEqual.new(left, right)
+        comparison_node = MSFLVisitors::Nodes::GreaterThanEqual.new left, right
         expect(subject.call(explicit_gte_filter)).to eq expected_node.call(comparison_node)
       end
 
-      it "handles containments"
+      # { value: { in: [50, 250, 20000] } }
+      #
+      #  => Nodes::Containment.new(Nodes::Field.new(:value),
+      #                            Nodes::Set::Set.new([
+      #                               Nodes::Number.new(50),
+      #                               Nodes::Number.new(250),
+      #                               Nodes::Number.new(20000)]))
+      it "handles containments" do
+        contained_nodes = containment_values.map { |value| MSFLVisitors::Nodes::Number.new(value) }
+        set_node = MSFLVisitors::Nodes::Set::Set.new(contained_nodes)
+        containment_node = MSFLVisitors::Nodes::Containment.new left, set_node
+        expect(subject.call(containment_filter)).to eq expected_node.call(containment_node)
+      end
 
       context "when the filter contains an unsupported type" do
 

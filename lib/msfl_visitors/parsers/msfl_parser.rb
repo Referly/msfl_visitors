@@ -7,6 +7,7 @@ module MSFLVisitors
       OPERATORS_TO_NODE_CLASS = {
           gt:         Nodes::GreaterThan,
           gte:        Nodes::GreaterThanEqual,
+          in:         Nodes::Containment,
       }
 
       def parse(obj, lhs = false)
@@ -49,7 +50,11 @@ module MSFLVisitors
       end
 
       def parse_Set(obj, lhs = false)
-
+        nodes = MSFL::Types::Set.new([])
+        obj.each do |item|
+          nodes << parse(item)
+        end
+        MSFLVisitors::Nodes::Set::Set.new nodes
       end
 
       def hash_dispatch(key, value, lhs = false)
