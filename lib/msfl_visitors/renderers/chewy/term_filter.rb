@@ -44,6 +44,9 @@ module MSFLVisitors
           when Nodes::Set::Close
             ' ]'
 
+          when Nodes::Set::Delimiter
+            ', '
+
           when Nodes::Set::Open
             '[ '
 

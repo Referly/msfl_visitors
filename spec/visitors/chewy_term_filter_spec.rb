@@ -20,6 +20,21 @@ describe MSFLVisitors::Visitor do
 
   context "when visiting" do
 
+    describe "a Set node" do
+
+      let(:node) { MSFLVisitors::Nodes::Set::Set.new values }
+
+      let(:values) { MSFL::Types::Set.new([item_one, item_two]) }
+
+      let(:item_one) { MSFLVisitors::Nodes::Word.new "item_one" }
+
+      let(:item_two) { MSFLVisitors::Nodes::Word.new "item_two" }
+
+      it "results in: '[ \"item_one\", \"item_two\" ]'" do
+        expect(result).to eq "[ \"item_one\", \"item_two\" ]"
+      end
+    end
+
     describe "an Equal node" do
 
       let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
