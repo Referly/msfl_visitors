@@ -4,8 +4,12 @@ module MSFLVisitors
     class MSFLParser
       include MSFL::Validators::Definitions::HashKey
 
+      OPERATORS_TO_NODE_CLASS = {
+          gt:         Nodes::GreaterThan,
+          gte:        Nodes::GreaterThanEqual,
+      }
+
       def parse(obj, lhs = false)
-        # send("parse_#{obj.class.to_s.gsub('::', '_')}", obj, lhs)
         case obj
 
           when Float, Fixnum
@@ -35,7 +39,13 @@ module MSFLVisitors
         obj.each do |k, v|
           nodes << hash_dispatch(k, v, lhs)
         end
-        MSFLVisitors::Nodes::Filter.new nodes
+        # If there's exactly one node in nodes and it's a filter node we don't want to wrap it in yet
+        # another filter node, so we just return the filter node
+        if nodes.count == 1 && nodes.first.is_a?(MSFLVisitors::Nodes::Filter)
+          nodes.first
+        else
+          MSFLVisitors::Nodes::Filter.new nodes
+        end
       end
 
       def parse_Set(obj, lhs = false)
@@ -47,7 +57,7 @@ module MSFLVisitors
           # Detect the node type, forward the lhs if it was passed in (essentially when the operator is a binary op)
           args = [lhs, parse(value)] if lhs
           args ||= [parse(value)]
-          Object.const_get("MSFLVisitors::Nodes::#{key.to_s.capitalize}").new(*args)
+          OPERATORS_TO_NODE_CLASS[key].new(*args)
         else
           # the key is a field
           # there are three possible scenarios when they key is a field
