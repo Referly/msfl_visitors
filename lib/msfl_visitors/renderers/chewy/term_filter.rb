@@ -10,18 +10,14 @@ module MSFLVisitors
           Nodes::Equal            => ' == ',
         }
 
-        ITERATIVE_OPERATORS = {
-            Nodes::And            => ' & ',
-        }
-
         def render(node)
           case node
 
           when Nodes::Comparison
             BINARY_OPERATORS[node.class]
 
-          when Nodes::Iterator
-            ITERATIVE_OPERATORS[node.class]
+          when Nodes::BinaryAnd
+            ' & '
 
           when Nodes::Date, Nodes::Time
             node.value.iso8601
@@ -40,6 +36,15 @@ module MSFLVisitors
 
           when Nodes::Grouping::Open
             '( '
+
+          when Nodes::Set::Close
+            ' ]'
+
+          when Nodes::Set::Delimiter
+            ', '
+
+          when Nodes::Set::Open
+            '[ '
 
           else
             fail ArgumentError.new("Unrecognized node type: #{node.class}")

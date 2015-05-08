@@ -4,19 +4,19 @@ module MSFLVisitors
     class And < Iterator
 
       def accept(visitor)
-        unless items.empty?
-          items.inject(1) do |iteration, item|
-            if iteration < items.count
-              MSFLVisitors::Nodes::Grouping::Grouping.new(item).accept visitor
-              visitor.visit self
-            end
-            iteration + 1
+        nodes = Array.new
+        if items.count > 1
+          items.each do |item|
+            nodes << MSFLVisitors::Nodes::Grouping::Grouping.new(item)
+            nodes << BinaryAnd.new
           end
-          if items.count > 1
-            MSFLVisitors::Nodes::Grouping::Grouping.new(items.last).accept(visitor)
-          else
-            items.last.accept visitor
-          end
+          nodes.pop
+        elsif items.count == 1
+          nodes << items.first
+        end
+
+        nodes.each do |node|
+          node.accept visitor
         end
       end
     end

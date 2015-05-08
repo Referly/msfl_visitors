@@ -1,24 +1,20 @@
-require_relative 'base'
+require_relative 'set/set'
 module MSFLVisitors
   module Nodes
-    class Filter < Base
-
-      attr_accessor :contents
-
+    class Filter < Set::Set
       def accept(visitor)
-        contents.each do |item|
-          item.accept visitor
+        nodes = Array.new
+        if contents.count > 0
+          contents.each do |item|
+            nodes << item
+            nodes << Set::Delimiter.new
+          end
+          # Remove the last (and therefore extra) delimiter
+          nodes.pop
         end
-      end
-
-      # @param nodes [Array<MSFL::Nodes::Base>] the nodes that the filter surrounds
-      def initialize(nodes)
-        self.contents = Array(nodes)
-      end
-
-      def ==(other)
-        self.class == other.class &&
-            contents == other.contents
+        nodes.each do |node|
+          node.accept visitor
+        end
       end
     end
   end
