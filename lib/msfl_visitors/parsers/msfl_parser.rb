@@ -8,6 +8,7 @@ module MSFLVisitors
           gt:         Nodes::GreaterThan,
           gte:        Nodes::GreaterThanEqual,
           in:         Nodes::Containment,
+          and:        Nodes::And,
       }
 
       def parse(obj, lhs = false)

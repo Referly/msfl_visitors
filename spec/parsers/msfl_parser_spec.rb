@@ -30,9 +30,13 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       let(:explicit_gte_filter) { { value: { gte: 1000 } } }
 
-      let(:containment_filter) { { value: { in: containment_values } } }
+      let(:containment_filter) { { value: { in: set_of_values } } }
 
-      let(:containment_values) { MSFL::Types::Set.new [50, 250, 20000] }
+      let(:set_of_values) { MSFL::Types::Set.new [50, 250, 20000] }
+
+      let(:set_of_nodes) { set_of_values.map { |value| MSFLVisitors::Nodes::Number.new value } }
+
+      let(:set_node) { MSFLVisitors::Nodes::Set::Set.new set_of_nodes }
 
       it "handles implicit equality comparisons" do
         expect(subject.call(implicit_equality_filter)).to eq expected_node.call(MSFLVisitors::Nodes::Equal.new(left, right))
@@ -51,10 +55,19 @@ describe MSFLVisitors::Parsers::MSFLParser do
       #                               Nodes::Number.new(250),
       #                               Nodes::Number.new(20000)]))
       it "handles containments" do
-        contained_nodes = containment_values.map { |value| MSFLVisitors::Nodes::Number.new(value) }
-        set_node = MSFLVisitors::Nodes::Set::Set.new(contained_nodes)
         containment_node = MSFLVisitors::Nodes::Containment.new left, set_node
         expect(subject.call(containment_filter)).to eq expected_node.call(containment_node)
+      end
+
+      describe "parsing an and filter" do
+
+        let(:and_filter) { { and: set_of_values } }
+
+        let(:and_node) { MSFLVisitors::Nodes::And.new set_node }
+
+        it "parses the filter" do
+          expect(subject.call(and_filter)).to eq expected_node.call(and_node)
+        end
       end
 
       context "when the filter contains an unsupported type" do
