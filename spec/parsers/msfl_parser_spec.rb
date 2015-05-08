@@ -3,17 +3,19 @@ require 'spec_helper'
 
 describe MSFLVisitors::Parsers::MSFLParser do
 
-  let(:expected_node) { ->(comp_node) { MSFLVisitors::Nodes::Filter.new [ comp_node ] } }
+  let(:expected_node) { ->(wrapped_node) { MSFLVisitors::Nodes::Filter.new [ wrapped_node ] } }
 
   let(:left) { MSFLVisitors::Nodes::Field.new :value }
 
-  let(:right) { MSFLVisitors::Nodes::Number.new 1000 }
+  let(:right) { MSFLVisitors::Nodes::Number.new one_thousand }
+
+  let(:one_thousand) { 1000 }
 
   describe "parsing a trivial filter" do
 
     subject { described_class.new.parse msfl }
 
-    let(:msfl) { { value: 1000 } }
+    let(:msfl) { { value: one_thousand } }
 
     it "is the expected node" do
       expect(subject).to eq expected_node.call(MSFLVisitors::Nodes::Equal.new(left, right))
@@ -34,7 +36,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       describe "parsing implicit equality" do
 
-        let(:filter) { { value: 1000 } }
+        let(:filter) { { value: one_thousand } }
 
         it "is the expected Equal node" do
           expect(subject).to eq expected_node.call(MSFLVisitors::Nodes::Equal.new(left, right))
@@ -43,13 +45,58 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       describe "parsing explict comparisons" do
 
+        describe "parsing a gt filter" do
+
+          let(:filter) { { value: { gt: one_thousand } } }
+
+          let(:gt_node) { MSFLVisitors::Nodes::GreaterThan.new left, right }
+
+          it "is the expected GreaterThan node" do
+            expect(subject).to eq expected_node.call(gt_node)
+          end
+        end
+
         describe "parsing a gte filter" do
 
-          let(:filter) { { value: { gte: 1000 } } }
+          let(:filter) { { value: { gte: one_thousand } } }
+
+          let(:gte_node) { MSFLVisitors::Nodes::GreaterThanEqual.new left, right }
 
           it "is the expected GreaterThanEqual node" do
-            comparison_node = MSFLVisitors::Nodes::GreaterThanEqual.new left, right
-            expect(subject).to eq expected_node.call(comparison_node)
+            expect(subject).to eq expected_node.call(gte_node)
+          end
+        end
+
+        describe "parsing a eq filter" do
+
+          let(:filter) { { value: { eq: one_thousand } } }
+
+          let(:eq_node) { MSFLVisitors::Nodes::Equal.new left, right }
+
+          it "is the expected Equal node" do
+            expect(subject).to eq expected_node.call(eq_node)
+          end
+        end
+
+        describe "parsing a lt filter" do
+
+          let(:filter) { { value: { lt: one_thousand } } }
+
+          let(:lt_node) { MSFLVisitors::Nodes::LessThan.new left, right }
+
+          it "is the expected LessThan node" do
+            expect(subject).to eq expected_node.call(lt_node)
+          end
+        end
+
+        describe "parsing a lte filter" do
+
+          let(:filter) { { value: { lte: one_thousand } } }
+
+          let(:lte_node) { MSFLVisitors::Nodes::LessThanEqual.new left, right }
+
+          it "is the expected LessThanEqual node" do
+            expect(subject).to eq expected_node.call(lte_node)
           end
         end
       end
@@ -58,6 +105,8 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
         let(:filter) { { value: { in: set_of_values } } }
 
+        let(:containment_node) { MSFLVisitors::Nodes::Containment.new left, set_node }
+
         # { value: { in: [50, 250, 20000] } }
         #
         #  => Nodes::Containment.new(Nodes::Field.new(:value),
@@ -65,8 +114,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
         #                               Nodes::Number.new(50),
         #                               Nodes::Number.new(250),
         #                               Nodes::Number.new(20000)]))
-        it "handles containments" do
-          containment_node = MSFLVisitors::Nodes::Containment.new left, set_node
+        it "is the expected Containment node" do
           expect(subject).to eq expected_node.call(containment_node)
         end
       end
@@ -77,7 +125,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
         let(:and_node) { MSFLVisitors::Nodes::And.new set_node }
 
-        it "parses the filter" do
+        it "is the expected And node" do
           expect(subject).to eq expected_node.call(and_node)
         end
       end

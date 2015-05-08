@@ -2,13 +2,17 @@ require 'msfl'
 module MSFLVisitors
   module Parsers
     class MSFLParser
-      include MSFL::Validators::Definitions::HashKey
+      # include MSFL::Validators::Definitions::HashKey
 
       OPERATORS_TO_NODE_CLASS = {
+          and:        Nodes::And,
           gt:         Nodes::GreaterThan,
           gte:        Nodes::GreaterThanEqual,
+          eq:         Nodes::Equal,
+          lt:         Nodes::LessThan,
+          lte:        Nodes::LessThanEqual,
           in:         Nodes::Containment,
-          and:        Nodes::And,
+
       }
 
       def parse(obj, lhs = false)
@@ -59,7 +63,7 @@ module MSFLVisitors
       end
 
       def hash_dispatch(key, value, lhs = false)
-        if hash_key_operators.include? key
+        if OPERATORS_TO_NODE_CLASS.include? key
           # Detect the node type, forward the lhs if it was passed in (essentially when the operator is a binary op)
           args = [lhs, parse(value)] if lhs
           args ||= [parse(value)]
