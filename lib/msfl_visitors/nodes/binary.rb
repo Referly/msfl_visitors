@@ -6,9 +6,9 @@ module MSFLVisitors
       attr_accessor :left, :right
 
       def accept(visitor)
-        visitor.visit left
+        left.accept visitor
         visitor.visit self
-        visitor.visit right
+        right.accept visitor
       end
 
       def initialize(left, right)

@@ -46,6 +46,9 @@ module MSFLVisitors
           when Nodes::Set::Open
             '[ '
 
+          when Nodes::Containment
+            ' == '
+
           else
             fail ArgumentError.new("Unrecognized node type: #{node.class}")
           end

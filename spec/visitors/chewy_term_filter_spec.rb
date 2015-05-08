@@ -20,6 +20,25 @@ describe MSFLVisitors::Visitor do
 
   context "when visiting" do
 
+    describe "a Containment node" do
+
+      let(:node) { MSFLVisitors::Nodes::Containment.new field, values }
+
+      let(:values) { MSFLVisitors::Nodes::Set::Set.new(MSFL::Types::Set.new([item_one, item_two, item_three])) }
+
+      let(:item_one) { MSFLVisitors::Nodes::Word.new "item_one" }
+
+      let(:item_two) { MSFLVisitors::Nodes::Word.new "item_two" }
+
+      let(:item_three) { MSFLVisitors::Nodes::Word.new "item_three" }
+
+      let(:field)  { left }
+
+      it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
+        expect(subject).to eq "lhs == [ \"item_one\", \"item_two\", \"item_three\" ]"
+      end
+    end
+
     describe "a Set node" do
 
       let(:node) { MSFLVisitors::Nodes::Set::Set.new values }
