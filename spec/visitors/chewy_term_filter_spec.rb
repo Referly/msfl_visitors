@@ -4,7 +4,7 @@ describe MSFLVisitors::Visitor do
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  let(:collector) { String.new }
+  let(:collector) { MSFLVisitors::Collectors::Chewy::TermFilter.new  }
 
   let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
 
@@ -151,6 +151,44 @@ describe MSFLVisitors::Visitor do
 
         it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )'" do
           expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )'
+        end
+      end
+
+      context "when one of the node's items is a containment node" do
+
+        let(:node) do
+          MSFLVisitors::Nodes::And.new(
+              MSFLVisitors::Nodes::Set::Set.new(
+                  [
+                      MSFLVisitors::Nodes::Filter.new(
+                          [
+                              MSFLVisitors::Nodes::Containment.new(
+                                  MSFLVisitors::Nodes::Field.new(:make),
+                                  MSFLVisitors::Nodes::Set::Set.new(
+                                      [
+                                          MSFLVisitors::Nodes::Word.new("Honda"),
+                                          MSFLVisitors::Nodes::Word.new("Chevy"),
+                                          MSFLVisitors::Nodes::Word.new("Volvo")
+                                      ]
+                                  )
+                              )
+                          ]
+                      ),
+                      MSFLVisitors::Nodes::Filter.new(
+                          [
+                              MSFLVisitors::Nodes::GreaterThanEqual.new(
+                                  MSFLVisitors::Nodes::Field.new(:value),
+                                  MSFLVisitors::Nodes::Number.new(1000)
+                              )
+                          ]
+                      )
+                  ]
+              )
+          )
+        end
+
+        it "returns: '( make == [ \"Honda\", \"Chevy\", \"Volvo\" ] ) & ( value >= 1000 )'" do
+          expect(result).to eq '( make == [ "Honda", "Chevy", "Volvo" ] ) & ( value >= 1000 )'
         end
       end
     end

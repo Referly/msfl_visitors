@@ -128,6 +128,55 @@ describe MSFLVisitors::Parsers::MSFLParser do
         it "is the expected And node" do
           expect(subject).to eq expected_node.call(and_node)
         end
+
+        context "when it contains a containment filter" do
+
+          let(:makes) { MSFL::Types::Set.new(["Honda", "Chevy", "Volvo"]) }
+
+          let(:containment_filter) { { make: { in: makes } } }
+
+          let(:gte_filter) { { value: { gte: one_thousand } } }
+
+          let(:and_set) { MSFL::Types::Set.new([containment_filter, gte_filter]) }
+
+          let(:filter) { { and: and_set } }
+
+          let(:and_node) do
+            MSFLVisitors::Nodes::And.new(
+              MSFLVisitors::Nodes::Set::Set.new(
+                [
+                  MSFLVisitors::Nodes::Filter.new(
+                    [
+                      MSFLVisitors::Nodes::Containment.new(
+                        MSFLVisitors::Nodes::Field.new(:make),
+                        MSFLVisitors::Nodes::Set::Set.new(
+                          [
+                            MSFLVisitors::Nodes::Word.new("Honda"),
+                            MSFLVisitors::Nodes::Word.new("Chevy"),
+                            MSFLVisitors::Nodes::Word.new("Volvo")
+                          ]
+                        )
+                      )
+                    ]
+                  ),
+                  MSFLVisitors::Nodes::Filter.new(
+                    [
+                      MSFLVisitors::Nodes::GreaterThanEqual.new(
+                        MSFLVisitors::Nodes::Field.new(:value),
+                        MSFLVisitors::Nodes::Number.new(one_thousand)
+                      )
+                    ]
+                  )
+                ]
+              )
+            )
+          end
+
+          it "is the expected And node" do
+            expect(subject).to eq expected_node.call(and_node)
+          end
+
+        end
       end
 
       context "when the filter contains an unsupported type" do
