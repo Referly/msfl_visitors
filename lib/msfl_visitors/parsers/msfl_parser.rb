@@ -2,8 +2,6 @@ require 'msfl'
 module MSFLVisitors
   module Parsers
     class MSFLParser
-      # include MSFL::Validators::Definitions::HashKey
-
       OPERATORS_TO_NODE_CLASS = {
           and:        Nodes::And,
           gt:         Nodes::GreaterThan,
