@@ -3,15 +3,16 @@ module MSFLVisitors
   module Nodes
     class Iterator < Base
 
-      attr_accessor :items
+      attr_accessor :set
 
-      def initialize(nodes)
-        self.items = nodes
+      # @param set [MSFLVisitors::Nodes::Set::Set] a set node that allows its elements to be iterated over
+      def initialize(set)
+        self.set = set
       end
 
       def ==(other)
         self.class == other.class &&
-            items == other.items
+            set == other.set
       end
     end
   end

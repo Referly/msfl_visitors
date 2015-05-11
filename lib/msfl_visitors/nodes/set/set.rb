@@ -4,7 +4,11 @@ module MSFLVisitors
     module Set
       class Set < Base
 
+        extend Forwardable
+
         attr_accessor :contents
+
+        def_delegators :contents, :count, :first, :each
 
         def accept(visitor)
           nodes = Array.new

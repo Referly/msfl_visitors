@@ -5,14 +5,14 @@ module MSFLVisitors
 
       def accept(visitor)
         nodes = Array.new
-        if items.count > 1
-          items.each do |item|
+        if set.count > 1
+          set.each do |item|
             nodes << MSFLVisitors::Nodes::Grouping::Grouping.new(item)
             nodes << BinaryAnd.new
           end
           nodes.pop
-        elsif items.count == 1
-          nodes << items.first
+        elsif set.count == 1
+          nodes << set.first
         end
 
         nodes.each do |node|
