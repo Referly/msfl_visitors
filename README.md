@@ -11,7 +11,7 @@ A visitor pattern based approach for converting MSFL to other forms
 
  filter = { make: "Toyota" }
 
- collector = String.new
+ collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
 
  renderer = MSFLVisitors::Renderers::Chewy::TermFilter.new
 
@@ -57,6 +57,8 @@ multiple output DSLs.
 During traversal the output from each node needs to be stored or buffered somewhere. The collector serves this role.
 It can be as simple as a String or an Array, or it can be more elaborate. Ultimately it must respond to the shovel
 operator (<<)
+
+The gem's client should pass the appropriate collector to the Visitor constructor.
 
 ## renderer
 
