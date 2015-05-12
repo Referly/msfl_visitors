@@ -121,11 +121,11 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       describe "parsing a foreign filter" do
 
-        let(:filter) { { person: { age: 25 } } }
+        let(:filter) { { foreign: { dataset: "person", filter: { age: 25 } } } }
 
-        let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new foreign_name_node, filter_node }
+        let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new dataset_node, explicit_filter_node }
 
-        let(:filter_node) { MSFLVisitors::Nodes::Filter.new [equal_node] }
+        let(:explicit_filter_node) { MSFLVisitors::Nodes::ExplicitFilter.new [equal_node] }
 
         let(:equal_node) { MSFLVisitors::Nodes::Equal.new field_node, value_node }
 
@@ -133,7 +133,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
         let(:value_node) { MSFLVisitors::Nodes::Number.new 25 }
 
-        let(:foreign_name_node) { MSFLVisitors::Nodes::Word.new :person }
+        let(:dataset_node) { MSFLVisitors::Nodes::Dataset.new "person" }
 
         subject { described_class.new(MSFL::Datasets::Car.new).parse(filter) }
 

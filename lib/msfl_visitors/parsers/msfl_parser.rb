@@ -10,6 +10,9 @@ module MSFLVisitors
           lt:         Nodes::LessThan,
           lte:        Nodes::LessThanEqual,
           in:         Nodes::Containment,
+          foreign:    Nodes::Foreign,
+          dataset:    Nodes::Dataset,
+          filter:     Nodes::ExplicitFilter,
 
       }
 
@@ -64,15 +67,27 @@ module MSFLVisitors
         MSFLVisitors::Nodes::Set::Set.new nodes
       end
 
+      # A key/value pair needs to be parsed and handled while iterating across the Hash that the key/value pair belong to
+      # lhs is for when the field is a parent of the actual operator node
+      # ex. { year: { gte: 2010 } } needs to be converted to (gte(year, 2010)) -- infix operators to RPN
       def hash_dispatch(key, value, lhs = false)
         if OPERATORS_TO_NODE_CLASS.include? key
           # Detect the node type, forward the lhs if it was passed in (essentially when the operator is a binary op)
-          args = [lhs, parse(value)] if lhs
-          args ||= [parse(value)]
+          case key
+            when :foreign
+              args = [hash_dispatch(:dataset, value[:dataset]), hash_dispatch(:filter, value[:filter])]
+            when :dataset
+              args = [value]
+            when :filter
+              # Explicit Filter
+              # ex { foreign: { dataset: "person", filter: { age: 25 } } }
+              args = value.map { |k,v| hash_dispatch(k,v) }
+            else
+              # fall back to a Filter Node
+              args = [lhs, parse(value)] if lhs
+              args ||= [parse(value)]
+          end
           OPERATORS_TO_NODE_CLASS[key].new(*args)
-        elsif dataset && dataset.foreigns.include?(key)
-          # It's a foreign
-          MSFLVisitors::Nodes::Foreign.new MSFLVisitors::Nodes::Word.new(key), parse(value)
         else
           # the key is a field
           # there are three possible scenarios when they key is a field
