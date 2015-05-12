@@ -34,9 +34,13 @@ module MSFLVisitors
       end
 
 
-
+      def initialize(dataset = nil)
+        @dataset = dataset
+      end
 
     private
+
+      attr_accessor :dataset
 
       def parse_Hash(obj, lhs = false)
         nodes = Array.new
@@ -66,6 +70,9 @@ module MSFLVisitors
           args = [lhs, parse(value)] if lhs
           args ||= [parse(value)]
           OPERATORS_TO_NODE_CLASS[key].new(*args)
+        elsif dataset && dataset.foreigns.include?(key)
+          # It's a foreign
+          MSFLVisitors::Nodes::Foreign.new MSFLVisitors::Nodes::Word.new(key), parse(value)
         else
           # the key is a field
           # there are three possible scenarios when they key is a field

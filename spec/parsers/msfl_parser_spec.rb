@@ -119,6 +119,29 @@ describe MSFLVisitors::Parsers::MSFLParser do
         end
       end
 
+      describe "parsing a foreign filter" do
+
+        let(:filter) { { person: { age: 25 } } }
+
+        let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new foreign_name_node, filter_node }
+
+        let(:filter_node) { MSFLVisitors::Nodes::Filter.new [equal_node] }
+
+        let(:equal_node) { MSFLVisitors::Nodes::Equal.new field_node, value_node }
+
+        let(:field_node) { MSFLVisitors::Nodes::Field.new :age }
+
+        let(:value_node) { MSFLVisitors::Nodes::Number.new 25 }
+
+        let(:foreign_name_node) { MSFLVisitors::Nodes::Word.new :person }
+
+        subject { described_class.new(MSFL::Datasets::Car.new).parse(filter) }
+
+        it "is the expected Foreign node" do
+          expect(subject).to eq expected_node.call(foreign_node)
+        end
+      end
+
       describe "parsing an and filter" do
 
         let(:filter) { { and: set_of_values } }
