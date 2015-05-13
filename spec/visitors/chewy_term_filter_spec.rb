@@ -20,6 +20,64 @@ describe MSFLVisitors::Visitor do
 
   context "when visiting" do
 
+    # chewy looks like
+    # Index::Type.aggregations({toyotas: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}})
+    describe "a Partial node" do
+
+      let(:node)                    { MSFLVisitors::Nodes::Partial.new given_node, explicit_filter_node }
+
+        let(:given_node)              { MSFLVisitors::Nodes::Given.new [given_equal_node] }
+
+          let(:given_equal_node)        { MSFLVisitors::Nodes::Equal.new given_field_node, given_value_node }
+
+          let(:given_field_node)          { MSFLVisitors::Nodes::Field.new :make }
+
+            let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
+
+        let(:explicit_filter_node)    { MSFLVisitors::Nodes::ExplicitFilter.new [greater_than_node] }
+
+          let(:greater_than_node)              { MSFLVisitors::Nodes::GreaterThan.new field_node, value_node }
+
+            let(:field_node)              { MSFLVisitors::Nodes::Field.new :age }
+
+            let(:value_node)              { MSFLVisitors::Nodes::Number.new 10 }
+
+
+      it "results in the appropriate aggregation clause" do
+        exp = [{
+                   clause: {
+                       given: {
+                           filter: {
+                               term: { make: "Toyota" }
+                           },
+                           aggs: {
+                               partial: {
+                                   filter: { range: { age: { gt: 10 }}}
+                               }
+                           }
+                       }
+                   },
+                   method_to_execute: :aggregations
+               }]
+        expect(subject).to eq exp
+      end
+    end
+
+    describe "a Given node" do
+
+      let(:node)                    { MSFLVisitors::Nodes::Given.new [given_equal_node] }
+
+        let(:given_equal_node)        { MSFLVisitors::Nodes::Equal.new given_field_node, given_value_node }
+
+          let(:given_field_node)        { MSFLVisitors::Nodes::Field.new :make }
+
+          let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
+
+      it "results in: " do
+        expect(subject).to eq [{}]
+      end
+    end
+
     describe "a Foreign node" do
 
       let(:node) { MSFLVisitors::Nodes::Foreign.new dataset_node, filter_node }
@@ -34,7 +92,7 @@ describe MSFLVisitors::Visitor do
 
       let(:right) { MSFLVisitors::Nodes::Number.new 25 }
 
-      it "results in [{ clause: \"age == 25\", dataset: \"person\" }]" do
+      it "results in: [{ clause: \"age == 25\", dataset: \"person\" }]" do
         expect(subject).to eq [{ clause: "age == 25", dataset: "person" }]
       end
     end
