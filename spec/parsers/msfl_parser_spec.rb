@@ -119,26 +119,60 @@ describe MSFLVisitors::Parsers::MSFLParser do
         end
       end
 
-      describe "parsing a foreign filter" do
-
-        let(:filter) { { foreign: { dataset: "person", filter: { age: 25 } } } }
-
-        let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new dataset_node, explicit_filter_node }
+      describe "parsing filters that contain explicit filters" do
 
         let(:explicit_filter_node) { MSFLVisitors::Nodes::ExplicitFilter.new [equal_node] }
 
         let(:equal_node) { MSFLVisitors::Nodes::Equal.new field_node, value_node }
 
-        let(:field_node) { MSFLVisitors::Nodes::Field.new :age }
+        describe "parsing a foreign filter" do
 
-        let(:value_node) { MSFLVisitors::Nodes::Number.new 25 }
+          let(:filter) { { foreign: { dataset: "person", filter: { age: 25 } } } }
 
-        let(:dataset_node) { MSFLVisitors::Nodes::Dataset.new "person" }
+          let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new dataset_node, explicit_filter_node }
 
-        subject { described_class.new(MSFL::Datasets::Car.new).parse(filter) }
+          let(:field_node) { MSFLVisitors::Nodes::Field.new :age }
 
-        it "is the expected Foreign node" do
-          expect(subject).to eq expected_node.call(foreign_node)
+          let(:value_node) { MSFLVisitors::Nodes::Number.new 25 }
+
+          let(:dataset_node) { MSFLVisitors::Nodes::Dataset.new "person" }
+
+          subject { described_class.new(MSFL::Datasets::Car.new).parse(filter) }
+
+          it "is the expected Foreign node" do
+            expect(subject).to eq expected_node.call(foreign_node)
+          end
+        end
+
+        describe "parsing a partial" do
+
+          let(:filter) { { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } } }
+
+
+
+          let(:partial_node)        { MSFLVisitors::Nodes::Partial.new given_node, explicit_filter_node }
+
+            let(:given_node)          { MSFLVisitors::Nodes::Given.new [given_equal_node] }
+
+              let(:given_equal_node)    { MSFLVisitors::Nodes::Equal.new given_field_node, given_value_node }
+
+                let(:given_field_node)    { MSFLVisitors::Nodes::Field.new :make }
+
+                let(:given_value_node)    { MSFLVisitors::Nodes::Word.new "Toyota" }
+
+
+            # explicit_filter_node already defined
+
+              # equal_node already defined
+
+                let(:field_node)          { MSFLVisitors::Nodes::Field.new :avg_age }
+
+                let(:value_node)          { MSFLVisitors::Nodes::Number.new 10 }
+
+
+          it "is the expected Partial node" do
+            expect(subject).to eq expected_node.call(partial_node)
+          end
         end
       end
 

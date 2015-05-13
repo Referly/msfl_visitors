@@ -1,7 +1,7 @@
-require_relative 'binary'
+require_relative 'binary/binary'
 module MSFLVisitors
   module Nodes
-    class Containment < Binary
+    class Containment < Binary::Binary
     end
   end
 end

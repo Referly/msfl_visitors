@@ -13,6 +13,8 @@ module MSFLVisitors
           foreign:    Nodes::Foreign,
           dataset:    Nodes::Dataset,
           filter:     Nodes::ExplicitFilter,
+          given:      Nodes::Given,
+          partial:    Nodes::Partial,
 
       }
 
@@ -76,11 +78,16 @@ module MSFLVisitors
           case key
             when :foreign
               args = [hash_dispatch(:dataset, value[:dataset]), hash_dispatch(:filter, value[:filter])]
+
+            when :partial
+              args = [hash_dispatch(:given, value[:given]), hash_dispatch(:filter, value[:filter])]
+
             when :dataset
               args = [value]
-            when :filter
+            when :filter, :given
               # Explicit Filter
               # ex { foreign: { dataset: "person", filter: { age: 25 } } }
+              # ex { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } }
               args = value.map { |k,v| hash_dispatch(k,v) }
             else
               # fall back to a Filter Node
