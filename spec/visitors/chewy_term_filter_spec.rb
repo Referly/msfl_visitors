@@ -14,11 +14,30 @@ describe MSFLVisitors::Visitor do
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { collector }
+  subject(:result) { collector.contents }
 
   before(:each) { node.accept visitor }
 
   context "when visiting" do
+
+    describe "a Foreign node" do
+
+      let(:node) { MSFLVisitors::Nodes::Foreign.new dataset_node, filter_node }
+
+      let(:dataset_node) { MSFLVisitors::Nodes::Dataset.new "person" }
+
+      let(:filter_node) { MSFLVisitors::Nodes::ExplicitFilter.new [equal_node] }
+
+      let(:equal_node) { MSFLVisitors::Nodes::Equal.new left, right }
+
+      let(:left) { MSFLVisitors::Nodes::Field.new :age }
+
+      let(:right) { MSFLVisitors::Nodes::Number.new 25 }
+
+      it "results in [{ clause: \"age == 25\", dataset: \"person\" }]" do
+        expect(subject).to eq [{ clause: "age == 25", dataset: "person" }]
+      end
+    end
 
     describe "a Containment node" do
 
@@ -34,8 +53,8 @@ describe MSFLVisitors::Visitor do
 
       let(:field)  { left }
 
-      it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
-        expect(subject).to eq "lhs == [ \"item_one\", \"item_two\", \"item_three\" ]"
+      it "results in: [{ clause: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]' }]" do
+        expect(subject).to eq [{ clause: "lhs == [ \"item_one\", \"item_two\", \"item_three\" ]" }]
       end
     end
 
@@ -49,8 +68,8 @@ describe MSFLVisitors::Visitor do
 
       let(:item_two) { MSFLVisitors::Nodes::Word.new "item_two" }
 
-      it "results in: '[ \"item_one\", \"item_two\" ]'" do
-        expect(result).to eq "[ \"item_one\", \"item_two\" ]"
+      it "results in: [{ clause: '[ \"item_one\", \"item_two\" ]' }]" do
+        expect(result).to eq [{ clause: "[ \"item_one\", \"item_two\" ]" }]
       end
     end
 
@@ -58,8 +77,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
 
-      it "results in: 'left == right'" do
-        expect(result).to eq "lhs == \"rhs\""
+      it "results in: [{ clause: 'left == right' }]" do
+        expect(result).to eq [{ clause: "lhs == \"rhs\"" }]
       end
     end
 
@@ -67,8 +86,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::GreaterThan.new left, right }
 
-      it "returns: 'left > right'" do
-        expect(result).to eq "lhs > \"rhs\""
+      it "returns: [{ clause: 'left > right' }]" do
+        expect(result).to eq [{ clause: "lhs > \"rhs\"" }]
       end
     end
 
@@ -76,8 +95,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::GreaterThanEqual.new left, right }
 
-      it "returns: 'left >= right'" do
-        expect(result).to eq "lhs >= \"rhs\""
+      it "returns: [{ clause: 'left >= right' }]" do
+        expect(result).to eq [{ clause: "lhs >= \"rhs\"" }]
       end
     end
 
@@ -85,8 +104,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::LessThan.new left, right }
 
-      it "returns: 'left < right'" do
-        expect(result).to eq 'lhs < "rhs"'
+      it "returns: [{ clause: 'left < right' }]" do
+        expect(result).to eq [{ clause: 'lhs < "rhs"' }]
       end
     end
 
@@ -94,8 +113,8 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::LessThanEqual.new left, right }
 
-      it "returns: 'left <= right'" do
-        expect(result).to eq 'lhs <= "rhs"'
+      it "returns: [{ clause: 'left <= right' }]" do
+        expect(result).to eq [{ clause: 'lhs <= "rhs"' }]
       end
     end
 
@@ -132,7 +151,7 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::And.new([first])}
 
         it "returns: the item without adding parentheses" do
-          expect(result).to eq 'first_field == "first_word"'
+          expect(result).to eq [{ clause: 'first_field == "first_word"' }]
         end
       end
 
@@ -140,8 +159,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::And.new([first, second]) }
 
-        it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" )'" do
-          expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" )'
+        it "returns: [{ clause: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" )' }]" do
+          expect(result).to eq [{ clause: '( first_field == "first_word" ) & ( second_field == "second_word" )' }]
         end
       end
 
@@ -149,8 +168,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::And.new([first, second, third]) }
 
-        it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )'" do
-          expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )'
+        it "returns: [{ clause: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )' }]" do
+          expect(result).to eq [{ clause: '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )' }]
         end
       end
 
@@ -187,8 +206,8 @@ describe MSFLVisitors::Visitor do
           )
         end
 
-        it "returns: '( make == [ \"Honda\", \"Chevy\", \"Volvo\" ] ) & ( value >= 1000 )'" do
-          expect(result).to eq '( make == [ "Honda", "Chevy", "Volvo" ] ) & ( value >= 1000 )'
+        it "returns: [{ clause:'( make == [ \"Honda\", \"Chevy\", \"Volvo\" ] ) & ( value >= 1000 )' }]" do
+          expect(result).to eq [{ clause: '( make == [ "Honda", "Chevy", "Volvo" ] ) & ( value >= 1000 )' }]
         end
       end
     end
@@ -228,7 +247,7 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Word.new word }
 
         it "is a double quoted literal string" do
-          expect(result).to eq "\"#{word}\""
+          expect(result).to eq [{ clause: "\"#{word}\"" }]
         end
       end
     end
@@ -291,6 +310,8 @@ describe MSFLVisitors::Visitor do
           end
         end
       end
+
+
     end
   end
 end

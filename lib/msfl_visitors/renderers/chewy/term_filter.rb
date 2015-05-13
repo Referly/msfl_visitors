@@ -49,6 +49,12 @@ module MSFLVisitors
           when Nodes::Containment
             ' == '
 
+          when Nodes::Foreign
+            # noop for now
+
+          when Nodes::Dataset
+            node.value.to_s
+
           else
             fail ArgumentError.new("Unrecognized node type: #{node.class}")
           end

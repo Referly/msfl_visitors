@@ -1,7 +1,7 @@
-require_relative 'word'
+require_relative 'value'
 module MSFLVisitors
   module Nodes
-    class Dataset < Word
+    class Dataset < Value
     end
   end
 end

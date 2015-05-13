@@ -5,23 +5,24 @@ A visitor pattern based approach for converting MSFL to other forms
 
 ## Usage
 
- ```ruby
- # This is not actually working code yet! @todo revisit once Matt's refactor branch is merged.
- require 'msfl_visitor'
+```ruby
+require 'msfl_visitor'
 
- filter = { make: "Toyota" }
+filter    = { make: "Toyota" }
 
- collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
+collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
 
- renderer = MSFLVisitors::Renderers::Chewy::TermFilter.new
+renderer  = MSFLVisitors::Renderers::Chewy::TermFilter.new
 
- visitor = MSFLVisitors::Visitor.new collector, renderer
+visitor   = MSFLVisitors::Visitor.new collector, renderer
 
- MSFLVisitors::AST.new(filter).accept(visitor)
+MSFLVisitors::AST.new(filter).accept(visitor)
 
- => 'make == "Toyota"'
+collector.contents
 
- ```
+=> [{clause: 'make == "Toyota"'}]
+
+```
 
 ## Architecture
 
@@ -55,10 +56,10 @@ multiple output DSLs.
 ## collector
 
 During traversal the output from each node needs to be stored or buffered somewhere. The collector serves this role.
-It can be as simple as a String or an Array, or it can be more elaborate. Ultimately it must respond to the shovel
-operator (<<)
 
-The gem's client should pass the appropriate collector to the Visitor constructor.
+At this time the Chewy TermFilter collector has been implemented, after visitation has occurred you can access
+the results by invoking the #contents method which returns an Array of Hashes. Each Hash will have the key :clause and
+the corresponding value will be the string output for that specific clause of the visitation.
 
 ## renderer
 
