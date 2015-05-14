@@ -277,8 +277,6 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Boolean.new value }
 
-        # subject(:result) { node.accept(visitor).first }
-
         subject(:result) { node.accept visitor; visitor.contents }
 
         context "with a value of true" do
@@ -294,8 +292,8 @@ describe MSFLVisitors::Visitor do
 
           let(:value) { false }
 
-          it "returns: false" do
-            expect(result).to be false
+          it "returns: [{ clause:'false' }]" do
+            expect(result).to eq [{ clause:"false" }]
           end
         end
       end
@@ -316,7 +314,7 @@ describe MSFLVisitors::Visitor do
 
       let(:collector) { Array.new }
 
-      subject(:result) { node.accept(visitor).first }
+      subject(:result) { node.accept visitor; visitor.contents }
 
       describe "a Date node" do
 
@@ -325,7 +323,7 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Date.new today }
 
         it "returns: the date using iso8601 formatting" do
-          expect(result).to eq today.iso8601
+          expect(result).to eq [{ clause: today.iso8601 }]
         end
       end
 
@@ -336,7 +334,7 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Time.new now }
 
         it "returns: the time using iso8601 formatting" do
-          expect(result).to eq now.iso8601
+          expect(result).to eq [{ clause: now.iso8601 }]
         end
       end
 
@@ -347,7 +345,7 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::DateTime.new now }
 
         it "returns: the date and time using iso8601 formatting" do
-          expect(result).to eq now.iso8601
+          expect(result).to eq [{ clause: now.iso8601 }]
         end
       end
 
@@ -357,8 +355,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Number.new number }
 
-        it "returns: the number" do
-          expect(result).to eq number
+        it "returns: [{ clause: '123' }]" do
+          expect(result).to eq [{ clause: number.to_s }]
         end
 
         context "when the number is a float" do
@@ -366,12 +364,10 @@ describe MSFLVisitors::Visitor do
           let(:number) { 123.456 }
 
           it "returns: the number with the same precision" do
-            expect(result).to eq number
+            expect(result).to eq [{ clause: number.to_s }]
           end
         end
       end
-
-
     end
   end
 end
