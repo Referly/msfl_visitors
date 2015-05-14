@@ -8,20 +8,20 @@ describe MSFLVisitors::Visitor do
 
   # let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
 
-  let(:visitors) do
-    {
-        terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter,
-        aggregations_visitor: MSFLVisitors::Visitors::Chewy::Aggregations,
-    }
-  end
+  # let(:visitors) do
+  #   {
+  #       terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter,
+  #       aggregations_visitor: MSFLVisitors::Visitors::Chewy::Aggregations,
+  #   }
+  # end
 
-  let(:visitor) { described_class.new(visitors) }
+  let(:visitor) { described_class.new }
 
   let(:left) { MSFLVisitors::Nodes::Field.new "lhs" }
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { node.accept visitor; visitor.contents }
+  subject(:result) { node.accept visitor }
 
   context "when visiting" do
 
