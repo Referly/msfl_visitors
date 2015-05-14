@@ -4,19 +4,17 @@ describe MSFLVisitors::Visitor do
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  let(:collector) { MSFLVisitors::Collectors::Chewy::TermFilter.new  }
+  # let(:collector) { MSFLVisitors::Collectors::Chewy::TermFilter.new  }
 
-  let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
+  # let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
 
-  let(:visitor) { described_class.new collector, renderer }
+  let(:visitor) { described_class.new(terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter) }
 
   let(:left) { MSFLVisitors::Nodes::Field.new "lhs" }
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { collector.contents }
-
-  before(:each) { node.accept visitor }
+  subject(:result) { node.accept visitor; collector.contents }
 
   context "when visiting" do
 
@@ -44,6 +42,7 @@ describe MSFLVisitors::Visitor do
 
 
       it "results in the appropriate aggregation clause" do
+        pending 'still need to implement the aggregation renderer'
         exp = [{
                    clause: {
                        given: {
