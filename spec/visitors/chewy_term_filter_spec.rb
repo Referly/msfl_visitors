@@ -14,7 +14,7 @@ describe MSFLVisitors::Visitor do
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { node.accept visitor; collector.contents }
+  subject(:result) { node.accept visitor; visitor.contents }
 
   context "when visiting" do
 
@@ -73,6 +73,7 @@ describe MSFLVisitors::Visitor do
           let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
       it "results in: " do
+        pending 'need to implement aggregation renderer'
         expect(subject).to eq [{}]
       end
     end
@@ -276,14 +277,16 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Boolean.new value }
 
-        subject(:result) { node.accept(visitor).first }
+        # subject(:result) { node.accept(visitor).first }
+
+        subject(:result) { node.accept visitor; visitor.contents }
 
         context "with a value of true" do
 
           let(:value) { true }
 
-          it "returns: true" do
-            expect(result).to be true
+          it "returns: [{ clause:'true' }]" do
+            expect(result).to eq [{ clause: "true" }]
           end
         end
 

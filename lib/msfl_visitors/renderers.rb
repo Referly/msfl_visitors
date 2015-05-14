@@ -1,0 +1,1 @@
+require_relative 'renderers/chewy/term_filter'
