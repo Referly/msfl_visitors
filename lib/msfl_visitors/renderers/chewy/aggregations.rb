@@ -2,16 +2,24 @@ require_relative 'term_filter'
 module MSFLVisitors
   module Renderers
     module Chewy
-      class Aggregations < TermFilter
-        def render(node)
+      class Aggregations
+        def render(node, args = [])
           case node
 
             when Nodes::Given
-              byebug
               ' GIVEN '
 
+            when Nodes::Field
+              node.value.to_sym
+
+            when Nodes::Word
+              node.value.to_s
+
+            when Nodes::Equal
+              { term: { args.first => args.second } }
+
             else
-              super
+              fail ArgumentError, "Unable to render node in MSFLVisitors::Renderers::Chewy::Aggregations#render"
           end
         end
       end

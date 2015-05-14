@@ -21,7 +21,7 @@ describe MSFLVisitors::Visitor do
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { visitor.visit node; visitor.contents }
+  subject(:result) { node.accept visitor; visitor.contents }
 
   context "when visiting" do
 
@@ -143,6 +143,17 @@ describe MSFLVisitors::Visitor do
 
       it "results in: [{ clause: 'left == right' }]" do
         expect(result).to eq [{ clause: "lhs == \"rhs\"" }]
+      end
+
+      context "when the current visitor is Chewy::Aggregations" do
+
+        # before { visitor.send :current_visitor=, visitor.aggregations_visitor }
+
+        it "results in: [{ clause: { { term: { lhs: \"rhs\" } }]" do
+          # visitor.collector.current_mode = :aggregations
+          byebug
+          expect(result).to eq [{ clause: { term: { lhs: "rhs" } } }]
+        end
       end
     end
 

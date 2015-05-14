@@ -32,10 +32,7 @@ module MSFLVisitors
       if current_visitor.supported_node? obj
         current_visitor.visit(obj)
       else
-        visitors = [aggregations_visitor, terms_visitor]
-        next_visitor = visitors.select { |v| v.supported_node? obj }.first
-        fail ArgumentError, "Node type is not supported by any visitor" unless next_visitor
-        self.current_visitor = next_visitor
+        switch_visitor obj
         visit(obj)
       end
     end
@@ -51,6 +48,14 @@ module MSFLVisitors
     #
     def visitor_factory(klass)
       klass.new(collector, RENDERERS[klass].new) if VISITORS.include?(klass)
+    end
+
+    def switch_visitor(obj)
+      visitors = [aggregations_visitor, terms_visitor]
+      next_visitor = visitors.select { |v| v.supported_node? obj }.first
+      fail ArgumentError, "Node type is not supported by any visitor" unless next_visitor
+      self.current_visitor = next_visitor
+      collector.set_visitor_mode current_visitor.class
     end
   end
 end

@@ -2,31 +2,51 @@ require_relative 'collectors'
 module MSFLVisitors
   class Collector
 
-    attr_accessor :terms_collector
+    attr_accessor :collectors, :current_mode
+
+    COLLECTOR_MODES = {
+        Visitors::Chewy::Aggregations => :aggregations,
+        Visitors::Chewy::TermFilter => :terms,
+    }
 
     def initialize
-      self.terms_collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
+      self.collectors = Hash.new
+      self.current_mode = :terms
+      collectors[:terms]          = MSFLVisitors::Collectors::Chewy::TermFilter.new
+      collectors[:aggregations]   = MSFLVisitors::Collectors::Chewy::Aggregations.new
     end
 
     def <<(obj)
-      terms_collector << obj
+      collectors[current_mode] << obj
     end
 
     def next_clause!
-      terms_collector.next_clause!
+      collectors[current_mode].next_clause!
     end
 
     def current_dataset=(dataset)
-      terms_collector.current_dataset = dataset
+      collectors[current_mode].current_dataset = dataset
+    end
+
+    def set_visitor_mode(klass)
+      self.current_mode = COLLECTOR_MODES[klass]
     end
 
     def contents
-      collectors = [terms_collector]
+      string_collectors = [collectors[:terms]]
       all_clauses = []
-      collectors.each do |c|
+      string_collectors.each do |c|
         all_clauses.concat c.contents
       end
       all_clauses
+    end
+
+    def push(obj)
+      collectors[current_mode].push obj
+    end
+
+    def pop
+      collectors[current_mode].pop
     end
   end
 end
