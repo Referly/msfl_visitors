@@ -141,17 +141,19 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
 
-      it "results in: [{ clause: 'left == right' }]" do
-        expect(result).to eq [{ clause: "lhs == \"rhs\"" }]
+      context "when the current visitor is Chewy::TermFilter" do
+
+        it "results in: [{ clause: 'left == right' }]" do
+          expect(result).to eq [{ clause: "lhs == \"rhs\"" }]
+        end
       end
 
       context "when the current visitor is Chewy::Aggregations" do
 
-        # before { visitor.send :current_visitor=, visitor.aggregations_visitor }
+        before { visitor.send :current_visitor=, visitor.aggregations_visitor }
 
         it "results in: [{ clause: { { term: { lhs: \"rhs\" } }]" do
-          # visitor.collector.current_mode = :aggregations
-          byebug
+          visitor.collector.current_mode = :aggregations
           expect(result).to eq [{ clause: { term: { lhs: "rhs" } } }]
         end
       end

@@ -3,7 +3,7 @@ module MSFLVisitors
   module Renderers
     module Chewy
       class Aggregations
-        def render(node, args = [])
+        def render(node)
           case node
 
             when Nodes::Given
@@ -16,7 +16,7 @@ module MSFLVisitors
               node.value.to_s
 
             when Nodes::Equal
-              { term: { args.first => args.second } }
+              { term: node.value }
 
             else
               fail ArgumentError, "Unable to render node in MSFLVisitors::Renderers::Chewy::Aggregations#render"

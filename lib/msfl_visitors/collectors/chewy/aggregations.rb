@@ -1,18 +1,15 @@
+require 'delegate'
 module MSFLVisitors
   module Collectors
     module Chewy
-      class Aggregations < Hash
+      class Aggregations < SimpleDelegator
 
-        attr_accessor :stack
-
-        def push(obj)
-          self.stack ||= Array.new
-          self.stack.push obj
+        def initialize
+          __setobj__(Array.new)
         end
 
-        def pop
-          self.stack ||= Array.new
-          self.stack.pop
+        def contents
+          __getobj__.map { |clause| {clause: clause } }
         end
       end
     end

@@ -6,7 +6,7 @@ module MSFLVisitors
   class Visitor
     extend Forwardable
 
-    attr_accessor :aggregations_visitor, :terms_visitor, :collector
+    attr_accessor :aggregations_visitor, :terms_visitor, :collector, :current_visitor
 
     def_delegators :collector, :contents
 
@@ -23,6 +23,7 @@ module MSFLVisitors
     def initialize(visitors = {})
       self.collector                = Collector.new
       self.aggregations_visitor     = visitor_factory visitors[:aggregations_visitor]
+      self.aggregations_visitor.visitor = self
       self.terms_visitor            = visitor_factory visitors[:terms_visitor]
       self.current_visitor          = terms_visitor
     end
@@ -38,7 +39,6 @@ module MSFLVisitors
     end
 
   private
-    attr_accessor :current_visitor
 
     # Pass in a supported Visitors Class (the actual class constant) a newly created instance is returned
     #

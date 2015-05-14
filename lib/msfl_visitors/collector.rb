@@ -33,12 +33,20 @@ module MSFLVisitors
     end
 
     def contents
+      string_contents + agg_contents
+    end
+
+    def string_contents
       string_collectors = [collectors[:terms]]
       all_clauses = []
       string_collectors.each do |c|
         all_clauses.concat c.contents
       end
       all_clauses
+    end
+
+    def agg_contents
+      collectors[:aggregations].contents
     end
 
     def push(obj)

@@ -13,20 +13,28 @@ module MSFLVisitors
             Nodes::Word,
         ]
 
+        attr_accessor :visitor
+
         def visit(obj)
           return false unless supported_node?(obj)
-          case obj
-            when Nodes::Field
-              collector.push(renderer.render obj)
 
-            when Nodes::Word
-              foo = collector.pop
-              foo.call(renderer.render(obj))
+          case obj
+
+            # { clause: { range: { year: { gt: 2010 } } } }
+
+            # { clause: { term: { make: "Toyota" } } }
+
+            # { and: [x,y,z] }
+
+            # { clause: { and: [{ term: { make: "Toyota" }}, {range: { year: { gt: 2010 } } }] }
 
             when Nodes::Equal
-              left = collector.pop
-              collector.push Proc.new { |r| renderer.render(obj, [left,r]) }
+              collector << { term: { obj.left.accept(visitor) => obj.right.accept(visitor) }}
+
+            else
+              renderer.render obj
           end
+          # collector << renderer.render(obj)
         end
 
         def supported_node?(node)
@@ -36,3 +44,5 @@ module MSFLVisitors
     end
   end
 end
+
+
