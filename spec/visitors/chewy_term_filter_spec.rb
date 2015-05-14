@@ -26,10 +26,10 @@ describe MSFLVisitors::Visitor do
   context "when visiting" do
 
     # chewy looks like
-    # Index::Type.aggregations({toyotas: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}})
+    # Index::Type.filter { match_all }.aggregations({toyotas: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}})
     describe "a Partial node" do
 
-      let(:node)                    { MSFLVisitors::Nodes::Partial.new given_node, explicit_filter_node }
+      let(:node)                    { MSFLVisitors::Nodes::Partial.new given_node, named_value }
 
         let(:given_node)              { MSFLVisitors::Nodes::Given.new [given_equal_node] }
 
@@ -39,17 +39,19 @@ describe MSFLVisitors::Visitor do
 
             let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
+
+      let(:named_value)    { MSFLVisitors::Nodes::NamedValue.new MSFLVisitors::Nodes::Word.new("partial"), explicit_filter_node }
+
         let(:explicit_filter_node)    { MSFLVisitors::Nodes::ExplicitFilter.new [greater_than_node] }
 
-          let(:greater_than_node)              { MSFLVisitors::Nodes::GreaterThan.new field_node, value_node }
+            let(:greater_than_node)              { MSFLVisitors::Nodes::GreaterThan.new field_node, value_node }
 
-            let(:field_node)              { MSFLVisitors::Nodes::Field.new :age }
+              let(:field_node)              { MSFLVisitors::Nodes::Field.new :age }
 
-            let(:value_node)              { MSFLVisitors::Nodes::Number.new 10 }
+              let(:value_node)              { MSFLVisitors::Nodes::Number.new 10 }
 
 
       it "results in the appropriate aggregation clause" do
-        pending 'still need to implement the aggregation renderer'
         exp = [{
                    clause: {
                        given: {
@@ -65,6 +67,7 @@ describe MSFLVisitors::Visitor do
                    },
                    method_to_execute: :aggregations
                }]
+        visitor.mode = :aggregations
         expect(subject).to eq exp
       end
     end
@@ -79,8 +82,9 @@ describe MSFLVisitors::Visitor do
 
           let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
-      it "results in: " do
-        expect(subject).to eq [{}]
+      it "results in: { filter: { term: { make: \"Toyota\" } } }" do
+        visitor.mode = :aggregations
+        expect(subject).to eq({ filter: { term: { make: "Toyota" } } })
       end
     end
 
@@ -150,10 +154,9 @@ describe MSFLVisitors::Visitor do
 
       context "when the current visitor is Chewy::Aggregations" do
 
-        before { visitor.send :current_visitor=, visitor.aggregations_visitor }
+        before { visitor.mode = :aggregation }
 
         it "results in: [{ clause: { { term: { lhs: \"rhs\" } }]" do
-          visitor.collector.current_mode = :aggregations
           expect(result).to eq [{ clause: { term: { lhs: "rhs" } } }]
         end
       end

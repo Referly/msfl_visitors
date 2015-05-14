@@ -4,7 +4,7 @@ module MSFLVisitors
   module Nodes
     module Binary
       class Binary < Base
-        include Infix
+        # include Infix
         attr_accessor :left, :right
 
         def initialize(left, right)

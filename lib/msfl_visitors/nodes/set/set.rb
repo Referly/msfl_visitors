@@ -11,21 +11,22 @@ module MSFLVisitors
         def_delegators :contents, :count, :first, :each
 
         def accept(visitor)
-          nodes = Array.new
-          nodes << Open.new
-          if contents.count > 0
-            contents.each do |item|
-              nodes << item
-              nodes << Delimiter.new
-            end
-            # Remove the last (and therefore extra) delimiter
-            nodes.pop
-          end
-          nodes << Close.new
-
-          nodes.each do |node|
-            node.accept visitor
-          end
+          # nodes = Array.new
+          # nodes << Open.new
+          # if contents.count > 0
+          #   contents.each do |item|
+          #     nodes << item
+          #     nodes << Delimiter.new
+          #   end
+          #   # Remove the last (and therefore extra) delimiter
+          #   nodes.pop
+          # end
+          # nodes << Close.new
+          #
+          # nodes.each do |node|
+          #   node.accept visitor
+          # end
+          super
         end
 
         # @param nodes [Array<MSFL::Nodes::Base>] the nodes that the filter surrounds
