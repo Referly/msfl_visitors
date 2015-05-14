@@ -16,7 +16,7 @@ module MSFLVisitors
     ]
 
     RENDERERS = {
-        Visitors::Chewy::Aggregations => MSFLVisitors::Renderers::Chewy::TermFilter,
+        Visitors::Chewy::Aggregations => MSFLVisitors::Renderers::Chewy::Aggregations,
         Visitors::Chewy::TermFilter => MSFLVisitors::Renderers::Chewy::TermFilter,
     }
 
