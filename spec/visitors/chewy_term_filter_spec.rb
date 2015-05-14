@@ -8,13 +8,20 @@ describe MSFLVisitors::Visitor do
 
   # let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
 
-  let(:visitor) { described_class.new(terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter) }
+  let(:visitors) do
+    {
+        terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter,
+        aggregations_visitor: MSFLVisitors::Visitors::Chewy::Aggregations,
+    }
+  end
+
+  let(:visitor) { described_class.new(visitors) }
 
   let(:left) { MSFLVisitors::Nodes::Field.new "lhs" }
 
   let(:right) { MSFLVisitors::Nodes::Word.new "rhs" }
 
-  subject(:result) { node.accept visitor; visitor.contents }
+  subject(:result) { visitor.visit node; visitor.contents }
 
   context "when visiting" do
 
@@ -73,7 +80,6 @@ describe MSFLVisitors::Visitor do
           let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
       it "results in: " do
-        pending 'need to implement aggregation renderer'
         expect(subject).to eq [{}]
       end
     end
