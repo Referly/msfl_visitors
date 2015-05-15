@@ -76,7 +76,9 @@ module MSFLVisitors
                 Nodes::LessThanEqual
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
           when  Nodes::Set::Set
-            "[ " + node.contents.map { |n| n.accept(visitor) }.join(' , ') + " ]"
+            "[ " + node.contents.map { |n| n.accept(visitor) }.join(" , ") + " ]"
+          when Nodes::And
+            node.set.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
           else
             fail "TERMFILTER cannot visit: #{node.class.name}"
         end
@@ -128,6 +130,8 @@ module MSFLVisitors
             { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
           when Nodes::Set::Set
             node.contents.map { |n| n.accept(visitor) }
+          when Nodes::And
+            { and: node.set.map { |n| n.accept(visitor) } }
           else
             fail "AGGREGATIONS cannot visit: #{node.class.name}"
         end

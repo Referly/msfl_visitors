@@ -293,8 +293,20 @@ describe MSFLVisitors::Visitor do
       context "when the And node has zero items" do
         let(:node) { MSFLVisitors::Nodes::And.new([]) }
 
-        it "is empty" do
-          expect(result).to be_empty
+        context "when using the TermFilter visitor" do
+
+          it "is empty" do
+            expect(result).to be_empty
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [] }" do
+            expect(result).to eq({ and: [] })
+          end
         end
       end
 
