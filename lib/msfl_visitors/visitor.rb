@@ -1,6 +1,4 @@
 require 'forwardable'
-# require_relative 'collector'
-require_relative 'renderers'
 module MSFLVisitors
   class Visitor
 

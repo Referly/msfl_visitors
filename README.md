@@ -10,15 +10,9 @@ require 'msfl_visitor'
 
 filter    = { make: "Toyota" }
 
-collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
+visitor   = MSFLVisitors::Visitor.new 
 
-renderer  = MSFLVisitors::Renderers::Chewy::TermFilter.new
-
-visitor   = MSFLVisitors::Visitor.new collector, renderer
-
-MSFLVisitors::AST.new(filter).accept(visitor)
-
-collector.contents
+visitor.visit_tree MSFLVisitors::AST.new(filter)
 
 => [{clause: 'make == "Toyota"'}]
 
@@ -55,13 +49,8 @@ multiple output DSLs.
 
 ## collector
 
-During traversal the output from each node needs to be stored or buffered somewhere. The collector serves this role.
-
-At this time the Chewy TermFilter collector has been implemented, after visitation has occurred you can access
-the results by invoking the #contents method which returns an Array of Hashes. Each Hash will have the key :clause and
-the corresponding value will be the string output for that specific clause of the visitation.
+Removed as of 0.3
 
 ## renderer
 
-The logic for rendering the AST nodes into the output DSL is codified in a renderer. The two principle renderers at
-this time are Chewy::TermFilter and Chewy:QueryStringFilter
+Removed as of 0.3
