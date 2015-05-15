@@ -64,9 +64,9 @@ module MSFLVisitors
             node.value.to_s
           when  Nodes::Word
             "\"#{node.value}\""
-          when Nodes::Date
+          when Nodes::Date, Nodes::Time
             "\"#{node.value.iso8601}\""
-          when  Nodes::Number
+          when  Nodes::Number, Nodes::Boolean
             node.value
           when  Nodes::Containment,
                 Nodes::GreaterThan,
@@ -122,9 +122,11 @@ module MSFLVisitors
             # [{ clause:  }]
           when Nodes::Field
             node.value.to_sym
-          when Nodes::Date
+          when Nodes::Date, Nodes::Time
             node.value.iso8601
-          when Nodes::Word, Nodes::Number
+          when  Nodes::Word,
+                Nodes::Number,
+                Nodes::Boolean
             node.value
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,

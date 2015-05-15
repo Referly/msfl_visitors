@@ -420,7 +420,7 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: some hash" do
+          it "returns: { and: [{ terms: { make: [\"Honda\",\"Chevy\",\"Volvo\"]} }, { range: { value: { gte: 1000 } } }] }" do
             expected = { and: [{ terms: { make: ["Honda", "Chevy", "Volvo"]} }, { range: { value: { gte: 1000 } } }] }
             expect(result).to eq expected
           end
@@ -431,18 +431,28 @@ describe MSFLVisitors::Visitor do
     describe "value nodes" do
       describe "a Boolean node" do
 
-        let(:collector) { Array.new }
-
         let(:node) { MSFLVisitors::Nodes::Boolean.new value }
 
-        subject(:result) { node.accept visitor; visitor.contents }
+        subject(:result) { node.accept visitor }
 
         context "with a value of true" do
 
           let(:value) { true }
 
-          it "returns: [{ clause:'true' }]" do
-            expect(result).to eq [{ clause: "true" }]
+          context "when using the TermFilter visitor" do
+
+            it "returns: true" do
+              expect(result).to eq true
+            end
+          end
+
+          context "when using the Aggregations visitor" do
+
+            before { visitor.mode = :aggregations }
+
+            it "returns: true" do
+              expect(result).to eq true
+            end
           end
         end
 
@@ -450,8 +460,17 @@ describe MSFLVisitors::Visitor do
 
           let(:value) { false }
 
-          it "returns: [{ clause:'false' }]" do
-            expect(result).to eq [{ clause:"false" }]
+          it "returns: false" do
+            expect(result).to eq false
+          end
+
+          context "when using the Aggregations visitor" do
+
+            before { visitor.mode = :aggregations }
+
+            it "returns: false" do
+              expect(result).to eq false
+            end
           end
         end
       end
@@ -463,16 +482,23 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Word.new word }
 
         it "is a double quoted literal string" do
-          expect(result).to eq [{ clause: "\"#{word}\"" }]
+          expect(result).to eq "\"#{word}\""
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: the literal string" do
+            expect(result).to eq "#{word}"
+          end
         end
       end
     end
 
     describe "range value nodes" do
 
-      let(:collector) { Array.new }
-
-      subject(:result) { node.accept visitor; visitor.contents }
+      subject(:result) { node.accept visitor }
 
       describe "a Date node" do
 
@@ -481,7 +507,16 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Date.new today }
 
         it "returns: the date using iso8601 formatting" do
-          expect(result).to eq [{ clause: today.iso8601 }]
+          expect(result).to eq "\"#{today.iso8601}\""
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: the date using iso8601 formatting" do
+            expect(result).to eq "#{today.iso8601}"
+          end
         end
       end
 
@@ -492,7 +527,16 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::Time.new now }
 
         it "returns: the time using iso8601 formatting" do
-          expect(result).to eq [{ clause: now.iso8601 }]
+          expect(result).to eq "\"#{now.iso8601}\""
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: the date using iso8601 formatting" do
+            expect(result).to eq "#{now.iso8601}"
+          end
         end
       end
 
@@ -503,7 +547,16 @@ describe MSFLVisitors::Visitor do
         let(:node) { MSFLVisitors::Nodes::DateTime.new now }
 
         it "returns: the date and time using iso8601 formatting" do
-          expect(result).to eq [{ clause: now.iso8601 }]
+          expect(result).to eq "\"#{now.iso8601}\""
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: the date and time using iso8601 formatting" do
+            expect(result).to eq "#{now.iso8601}"
+          end
         end
       end
 
@@ -513,8 +566,17 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Number.new number }
 
-        it "returns: [{ clause: '123' }]" do
-          expect(result).to eq [{ clause: number.to_s }]
+        it "returns: 123" do
+          expect(result).to eq number
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: 123" do
+            expect(result).to eq number
+          end
         end
 
         context "when the number is a float" do
@@ -522,7 +584,16 @@ describe MSFLVisitors::Visitor do
           let(:number) { 123.456 }
 
           it "returns: the number with the same precision" do
-            expect(result).to eq [{ clause: number.to_s }]
+            expect(result).to eq number
+          end
+
+          context "when using the Aggregations visitor" do
+
+            before { visitor.mode = :aggregations }
+
+            it "returns: the number with the same precision" do
+              expect(result).to eq number
+            end
           end
         end
       end
