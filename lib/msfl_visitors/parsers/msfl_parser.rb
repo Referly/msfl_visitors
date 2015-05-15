@@ -80,7 +80,9 @@ module MSFLVisitors
               args = [hash_dispatch(:dataset, value[:dataset]), hash_dispatch(:filter, value[:filter])]
 
             when :partial
-              args = [hash_dispatch(:given, value[:given]), hash_dispatch(:filter, value[:filter])]
+              args = [hash_dispatch(:given, value[:given]),
+                      MSFLVisitors::Nodes::NamedValue.new(MSFLVisitors::Nodes::Word.new("partial"),
+                                                          hash_dispatch(:filter, value[:filter]))]
 
             when :dataset
               args = [value]

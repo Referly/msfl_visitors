@@ -11,6 +11,11 @@ module MSFLVisitors
       def accept(visitor)
         visitor.visit(self)
       end
+
+      def ==(other)
+        self.class == other.class &&
+            value == other.value
+      end
     end
   end
 end

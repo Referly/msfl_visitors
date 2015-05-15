@@ -39,9 +39,20 @@ describe MSFLVisitors do
 
         let(:msfl) { { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } } }
 
-        it "returns: [{:clause=>{partial: {terms: {make: \"Toyota\"}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]" do
-          pending 'waiting for a fix in the msfl normalization code'
-          expect(subject).to eq [{:clause=>{partial: {terms: {make: "Toyota" }, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]
+        it "returns: [{:clause=>{partial: {terms: {make: \"Toyota\"}, aggs: { filter: { range: { avg_age: { gt: 10 }}} }}}}]" do
+          expect(subject).to eq [
+            {
+                clause: {
+                    given: {
+                        filter: { term: { make: "Toyota"} },
+                        aggs: {
+                            partial: {
+                                filter: {
+                                    term: { avg_age: 10 }
+                                }}}}},
+                method_to_execute: :aggregations
+            }
+          ]
         end
       end
     end

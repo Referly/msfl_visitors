@@ -150,7 +150,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
 
 
-          let(:partial_node)        { MSFLVisitors::Nodes::Partial.new given_node, explicit_filter_node }
+          let(:partial_node)        { MSFLVisitors::Nodes::Partial.new given_node, named_value }
 
             let(:given_node)          { MSFLVisitors::Nodes::Given.new [given_equal_node] }
 
@@ -161,6 +161,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
                 let(:given_value_node)    { MSFLVisitors::Nodes::Word.new "Toyota" }
 
 
+          let(:named_value)    { MSFLVisitors::Nodes::NamedValue.new MSFLVisitors::Nodes::Word.new("partial"), explicit_filter_node }
             # explicit_filter_node already defined
 
               # equal_node already defined

@@ -71,24 +71,36 @@ describe MSFLVisitors::Visitor do
 
       subject { visitor.visit_tree node }
 
+      let(:expected) do
+        [{
+             clause: {
+                 given: {
+                     filter: {
+                         term: { make: "Toyota" }
+                     },
+                     aggs: {
+                         partial: {
+                             filter: { range: { age: { gt: 10 }}}
+                         }
+                     }
+                 }
+             },
+             method_to_execute: :aggregations
+         }]
+      end
+
       it "results in the appropriate aggregation clause" do
-        exp = [{
-                   clause: {
-                       given: {
-                           filter: {
-                               term: { make: "Toyota" }
-                           },
-                           aggs: {
-                               partial: {
-                                   filter: { range: { age: { gt: 10 }}}
-                               }
-                           }
-                       }
-                   },
-                   method_to_execute: :aggregations
-               }]
         visitor.mode = :aggregations
-        expect(subject).to eq exp
+        expect(subject).to eq expected
+      end
+
+      context "when the Partial node is wrapped in a Filter node" do
+
+        let(:node) { MSFLVisitors::Nodes::Filter.new([MSFLVisitors::Nodes::Partial.new(given_node, named_value)]) }
+
+        it "results in the appropriate aggregation clause" do
+          expect(subject).to eq expected
+        end
       end
     end
 
