@@ -163,8 +163,8 @@ describe MSFLVisitors::Visitor do
 
       context "when the current visitor is Chewy::TermFilter" do
 
-        it "results in: [{ clause: 'left == right' }]" do
-          expect(result).to eq [{ clause: "lhs == \"rhs\"" }]
+        it "results in: 'left == right'" do
+          expect(result).to eq "lhs == \"rhs\""
         end
       end
 

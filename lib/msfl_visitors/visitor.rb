@@ -52,19 +52,20 @@ module MSFLVisitors
       BINARY_OPERATORS = {
           Nodes::GreaterThan            => '>',
           Nodes::GreaterThanEqual       => '>=',
+          Nodes::Equal                  => '==',
       }
 
       def visit(node)
         case node
-          when Nodes::Equal
-            [{ clause: "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}" }]
           when Nodes::Field
             node.value.to_s
           when Nodes::Word
             "\"#{node.value}\""
           when Nodes::Number
             node.value
-          when Nodes::GreaterThan, Nodes::GreaterThanEqual
+          when  Nodes::GreaterThan,
+                Nodes::GreaterThanEqual,
+                Nodes::Equal
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
           when Nodes::Containment
             "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}"
