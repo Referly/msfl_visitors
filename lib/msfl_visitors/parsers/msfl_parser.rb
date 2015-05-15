@@ -34,7 +34,7 @@ module MSFLVisitors
             MSFLVisitors::Nodes::Word.new obj.to_s
 
           else
-            fail ArgumentError, "Invalid NMSFL, unable to parse."
+            fail ArgumentError, "Invalid NMSFL, unable to parse type: #{obj.class}."
         end
       end
 
