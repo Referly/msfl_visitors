@@ -4,17 +4,6 @@ describe MSFLVisitors::Visitor do
 
   let(:node) { fail ArgumentError, "You must define the node variable in each scope." }
 
-  # let(:collector) { MSFLVisitors::Collectors::Chewy::TermFilter.new  }
-
-  # let(:renderer) { MSFLVisitors::Renderers::Chewy::TermFilter.new }
-
-  # let(:visitors) do
-  #   {
-  #       terms_visitor: MSFLVisitors::Visitors::Chewy::TermFilter,
-  #       aggregations_visitor: MSFLVisitors::Visitors::Chewy::Aggregations,
-  #   }
-  # end
-
   let(:visitor) { described_class.new }
 
   let(:left) { MSFLVisitors::Nodes::Field.new "lhs" }
@@ -51,6 +40,8 @@ describe MSFLVisitors::Visitor do
               let(:value_node)              { MSFLVisitors::Nodes::Number.new 10 }
 
 
+      subject { visitor.visit_tree node }
+
       it "results in the appropriate aggregation clause" do
         exp = [{
                    clause: {
@@ -82,9 +73,10 @@ describe MSFLVisitors::Visitor do
 
           let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
-      it "results in: { filter: { term: { make: \"Toyota\" } } }" do
+
+      it "results in: [:filter, { term: { make: \"Toyota\" } }]" do
         visitor.mode = :aggregations
-        expect(subject).to eq({ filter: { term: { make: "Toyota" } } })
+        expect(subject).to eq([:filter, { term: { make: "Toyota" } }])
       end
     end
 
@@ -102,7 +94,7 @@ describe MSFLVisitors::Visitor do
 
       let(:right) { MSFLVisitors::Nodes::Number.new 25 }
 
-      it "results in: [{ clause: \"age == 25\", dataset: \"person\" }]" do
+      xit "results in: [{ clause: \"age == 25\", dataset: \"person\" }]" do
         expect(subject).to eq [{ clause: "age == 25", dataset: "person" }]
       end
     end
@@ -121,8 +113,8 @@ describe MSFLVisitors::Visitor do
 
       let(:field)  { left }
 
-      it "results in: [{ clause: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]' }]" do
-        expect(subject).to eq [{ clause: "lhs == [ \"item_one\", \"item_two\", \"item_three\" ]" }]
+      it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
+        expect(subject).to eq "lhs == [ \"item_one\" , \"item_two\" , \"item_three\" ]"
       end
     end
 

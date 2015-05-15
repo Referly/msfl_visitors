@@ -4,22 +4,25 @@ require_relative 'renderers'
 module MSFLVisitors
   class Visitor
 
+    attr_accessor :clauses, :current_clause
     attr_writer :mode
 
     def initialize
-      @mode = :term # or :aggregations
+      self.mode = :term # or :aggregations
+      self.clauses = Array.new
+
     end
 
     def visit(node)
       case node
         when Nodes::Partial
           in_aggregation_mode do
-            get_visitor.visit(node)
+            clauses << { clause: get_visitor.visit(node), method_to_execute: :aggregations }
+            ""
           end
         else
           get_visitor.visit(node)
       end
-
     end
 
     def get_visitor
@@ -31,6 +34,10 @@ module MSFLVisitors
       result = yield if block_given?
       self.mode = :term
       result
+    end
+
+    def visit_tree(root)
+      [{clause: root.accept(self)}].concat(clauses).reject { |c| c[:clause] == "" }
     end
 
     private
@@ -45,7 +52,7 @@ module MSFLVisitors
       def visit(node)
         case node
           when Nodes::Equal
-            [{ clause: "#{node.left.accept(@visitor)} == #{node.right.accept(@visitor)}" }]
+            [{ clause: "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}" }]
           when Nodes::Field
             node.value.to_s
           when Nodes::Word
@@ -54,10 +61,18 @@ module MSFLVisitors
             node.value
           when Nodes::GreaterThan
             fail 'YO'
+          when Nodes::Containment
+            "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}"
+          when Nodes::Set::Set
+            "[ " + node.contents.map { |n| n.accept(visitor) }.join(' , ') + " ]"
           else
-            fail "TERM: #{node.class.name}"
+            fail "TERMFILTER cannot visit: #{node.class.name}"
         end
       end
+
+      private
+
+      attr_reader :visitor
     end
 
     class AggregationsVisitor
@@ -68,7 +83,7 @@ module MSFLVisitors
       def visit(node)
         case node
           when Nodes::Partial
-            [{ clause: { given: Hash[[node.left.accept(visitor), node.right.accept(visitor)]] }}]
+            { given: Hash[[node.left.accept(visitor), node.right.accept(visitor)]] }
 
           when Nodes::Equal
             { term: { node.left.accept(visitor) => node.right.accept(visitor) } }
@@ -86,7 +101,7 @@ module MSFLVisitors
           when Nodes::NamedValue
             [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
           else
-            fail "AGGREGATIONS: #{node.class.name}"
+            fail "AGGREGATIONS cannot visit: #{node.class.name}"
         end
       end
 
