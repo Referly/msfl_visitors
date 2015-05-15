@@ -1,4 +1,5 @@
 require_relative 'base'
+require 'forwardable'
 module MSFLVisitors
   module Nodes
     class Filter < Base

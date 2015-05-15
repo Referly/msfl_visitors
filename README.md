@@ -6,17 +6,18 @@ A visitor pattern based approach for converting MSFL to other forms
 ## Usage
 
 ```ruby
-require 'msfl_visitor'
+require 'msfl'
+
+# Load one of the test datasets
+require 'msfl/datasets/car'
+
+require 'msfl_visitors'
 
 filter    = { make: "Toyota" }
 
-parser    = MSFLVisitors::Parsers::MSFLParser(dataset = MSFL::Dataset::Cars.new)
+dataset   = MSFL::Datasets::Car.new
 
-ast       = parser.parse(filter)
-
-visitor   = MSFLVisitors::Visitor.new 
-
-visitor.visit_tree ast
+MSFLVisitors.get_chewy_clauses dataset, filter
 
 => [{:clause=>"make == \"Toyota\""}]
 
