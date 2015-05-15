@@ -73,7 +73,7 @@ module MSFLVisitors
                 Nodes::LessThan,
                 Nodes::LessThanEqual
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
-          when  Nodes::Set::Set
+          when  Nodes::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(" , ") + " ]"
           when Nodes::Filter
             if node.contents.count == 1
@@ -147,7 +147,7 @@ module MSFLVisitors
             [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
           when Nodes::Containment
             { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
-          when Nodes::Set::Set
+          when Nodes::Set
             node.contents.map { |n| n.accept(visitor) }
           when Nodes::Filter
             if node.contents.count == 1

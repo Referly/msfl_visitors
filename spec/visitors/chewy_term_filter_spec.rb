@@ -115,7 +115,7 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::Containment.new field, values }
 
-      let(:values) { MSFLVisitors::Nodes::Set::Set.new(MSFL::Types::Set.new([item_one, item_two, item_three])) }
+      let(:values) { MSFLVisitors::Nodes::Set.new(MSFL::Types::Set.new([item_one, item_two, item_three])) }
 
       let(:item_one) { MSFLVisitors::Nodes::Word.new "item_one" }
 
@@ -144,7 +144,7 @@ describe MSFLVisitors::Visitor do
 
     describe "a Set node" do
 
-      let(:node) { MSFLVisitors::Nodes::Set::Set.new values }
+      let(:node) { MSFLVisitors::Nodes::Set.new values }
 
       let(:values) { MSFL::Types::Set.new([item_one, item_two]) }
 
@@ -306,7 +306,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the And node has zero items" do
 
-        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [] }
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [] }
 
         context "when using the TermFilter visitor" do
 
@@ -327,7 +327,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has one item" do
 
-        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first] }
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first] }
 
         context "when using the TermFilter visitor" do
 
@@ -348,7 +348,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has two items" do
 
-        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first, second] }
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first, second] }
 
         context "when using the TermFilter visitor" do
 
@@ -369,7 +369,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has three items" do
 
-        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first, second, third] }
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first, second, third] }
 
         context "when using the TermFilter visitor" do
 
@@ -392,13 +392,13 @@ describe MSFLVisitors::Visitor do
 
         let(:node) do
           MSFLVisitors::Nodes::And.new(
-              MSFLVisitors::Nodes::Set::Set.new(
+              MSFLVisitors::Nodes::Set.new(
                   [
                       MSFLVisitors::Nodes::Filter.new(
                           [
                               MSFLVisitors::Nodes::Containment.new(
                                   MSFLVisitors::Nodes::Field.new(:make),
-                                  MSFLVisitors::Nodes::Set::Set.new(
+                                  MSFLVisitors::Nodes::Set.new(
                                       [
                                           MSFLVisitors::Nodes::Word.new("Honda"),
                                           MSFLVisitors::Nodes::Word.new("Chevy"),

@@ -32,7 +32,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       let(:set_of_nodes) { set_of_values.map { |value| MSFLVisitors::Nodes::Number.new value } }
 
-      let(:set_node) { MSFLVisitors::Nodes::Set::Set.new set_of_nodes }
+      let(:set_node) { MSFLVisitors::Nodes::Set.new set_of_nodes }
 
       describe "parsing implicit equality" do
 
@@ -110,7 +110,7 @@ describe MSFLVisitors::Parsers::MSFLParser do
         # { value: { in: [50, 250, 20000] } }
         #
         #  => Nodes::Containment.new(Nodes::Field.new(:value),
-        #                            Nodes::Set::Set.new([
+        #                            Nodes::Set.new([
         #                               Nodes::Number.new(50),
         #                               Nodes::Number.new(250),
         #                               Nodes::Number.new(20000)]))
@@ -200,13 +200,13 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
           let(:and_node) do
             MSFLVisitors::Nodes::And.new(
-              MSFLVisitors::Nodes::Set::Set.new(
+              MSFLVisitors::Nodes::Set.new(
                 [
                   MSFLVisitors::Nodes::Filter.new(
                     [
                       MSFLVisitors::Nodes::Containment.new(
                         MSFLVisitors::Nodes::Field.new(:make),
-                        MSFLVisitors::Nodes::Set::Set.new(
+                        MSFLVisitors::Nodes::Set.new(
                           [
                             MSFLVisitors::Nodes::Word.new("Honda"),
                             MSFLVisitors::Nodes::Word.new("Chevy"),

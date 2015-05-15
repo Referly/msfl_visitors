@@ -66,7 +66,7 @@ module MSFLVisitors
         obj.each do |item|
           nodes << parse(item)
         end
-        MSFLVisitors::Nodes::Set::Set.new nodes
+        MSFLVisitors::Nodes::Set.new nodes
       end
 
       # A key/value pair needs to be parsed and handled while iterating across the Hash that the key/value pair belong to
