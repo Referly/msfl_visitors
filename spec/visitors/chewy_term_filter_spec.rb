@@ -170,7 +170,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the current visitor is Chewy::Aggregations" do
 
-        before { visitor.mode = :aggregation }
+        before { visitor.mode = :aggregations }
 
         it "results in: { term: { lhs: \"rhs\" } }" do
           expect(result).to eq({ term: { lhs: "rhs" } })
@@ -193,7 +193,7 @@ describe MSFLVisitors::Visitor do
 
       context "when using the Aggregations visitor" do
 
-        before { visitor.mode = :aggregation }
+        before { visitor.mode = :aggregations }
 
         it "results in: { range: { lhs: { gt: 1000 } } }" do
           expect(result).to eq({ range: { lhs: { gt: 1000 } } })
@@ -205,8 +205,22 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::GreaterThanEqual.new left, right }
 
-      it "returns: [{ clause: 'left >= right' }]" do
-        expect(result).to eq [{ clause: "lhs >= \"rhs\"" }]
+      let(:right) { MSFLVisitors::Nodes::Number.new 10.52 }
+
+      context "when using the TermFilter visitor" do
+
+        it "returns: 'left >= 10.52'" do
+          expect(result).to eq "lhs >= 10.52"
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: { range: { lhs: { gte: 10.52 } } }" do
+          expect(result).to eq({ range: { lhs: { gte: 10.52 } } })
+        end
       end
     end
 

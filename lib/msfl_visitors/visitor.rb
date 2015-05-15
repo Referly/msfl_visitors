@@ -49,6 +49,11 @@ module MSFLVisitors
         @visitor = visitor
       end
 
+      BINARY_OPERATORS = {
+          Nodes::GreaterThan            => '>',
+          Nodes::GreaterThanEqual       => '>=',
+      }
+
       def visit(node)
         case node
           when Nodes::Equal
@@ -59,8 +64,8 @@ module MSFLVisitors
             "\"#{node.value}\""
           when Nodes::Number
             node.value
-          when Nodes::GreaterThan
-            "#{node.left.accept(visitor)} > #{node.right.accept(visitor)}"
+          when Nodes::GreaterThan, Nodes::GreaterThanEqual
+            "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
           when Nodes::Containment
             "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}"
           when Nodes::Set::Set
@@ -80,6 +85,11 @@ module MSFLVisitors
         @visitor = visitor
       end
 
+      RANGE_OPERATORS = {
+          Nodes::GreaterThan            => :gt,
+          Nodes::GreaterThanEqual       => :gte,
+      }
+
       def visit(node)
         case node
           when Nodes::Partial
@@ -92,8 +102,8 @@ module MSFLVisitors
             node.value.to_sym
           when Nodes::Word, Nodes::Number
             node.value
-          when Nodes::GreaterThan
-            { range: { node.left.accept(visitor) => {gt: node.right.accept(visitor) } } }
+          when Nodes::GreaterThan, Nodes::GreaterThanEqual
+            { range: { node.left.accept(visitor) => { RANGE_OPERATORS[node.class] =>  node.right.accept(visitor) } } }
           when Nodes::Given
             [:filter, node.contents.first.accept(visitor)]
           when Nodes::ExplicitFilter
