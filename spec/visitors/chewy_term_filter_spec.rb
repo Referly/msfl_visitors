@@ -113,8 +113,11 @@ describe MSFLVisitors::Visitor do
 
       let(:field)  { left }
 
-      it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
-        expect(subject).to eq "lhs == [ \"item_one\" , \"item_two\" , \"item_three\" ]"
+      context "when using the TermFilter visitor" do
+
+        it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
+          expect(subject).to eq "lhs == [ \"item_one\" , \"item_two\" , \"item_three\" ]"
+        end
       end
 
       context "when using the Aggregations visitor" do
@@ -137,8 +140,11 @@ describe MSFLVisitors::Visitor do
 
       let(:item_two) { MSFLVisitors::Nodes::Word.new "item_two" }
 
-      it "results in: '[ \"item_one\" , \"item_two\" ]'" do
-        expect(result).to eq "[ \"item_one\" , \"item_two\" ]"
+      context "when using the TermFilter visitor" do
+
+        it "results in: '[ \"item_one\" , \"item_two\" ]'" do
+          expect(result).to eq "[ \"item_one\" , \"item_two\" ]"
+        end
       end
 
       context "when using the Aggregations visitor" do
@@ -166,8 +172,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregation }
 
-        it "results in: [{ clause: { { term: { lhs: \"rhs\" } }]" do
-          expect(result).to eq [{ clause: { term: { lhs: "rhs" } } }]
+        it "results in: { term: { lhs: \"rhs\" } }" do
+          expect(result).to eq({ term: { lhs: "rhs" } })
         end
       end
     end
@@ -176,8 +182,22 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::GreaterThan.new left, right }
 
-      it "returns: [{ clause: 'left > right' }]" do
-        expect(result).to eq [{ clause: "lhs > \"rhs\"" }]
+      let(:right) { MSFLVisitors::Nodes::Number.new 1000 }
+
+      context "when using the TermFilter visitor" do
+
+        it "returns: 'left > 1000'" do
+          expect(result).to eq "lhs > 1000"
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregation }
+
+        it "results in: { range: { lhs: { gt: 1000 } } }" do
+          expect(result).to eq({ range: { lhs: { gt: 1000 } } })
+        end
       end
     end
 

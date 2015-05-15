@@ -60,7 +60,7 @@ module MSFLVisitors
           when Nodes::Number
             node.value
           when Nodes::GreaterThan
-            fail 'YO'
+            "#{node.left.accept(visitor)} > #{node.right.accept(visitor)}"
           when Nodes::Containment
             "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}"
           when Nodes::Set::Set
