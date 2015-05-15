@@ -100,6 +100,10 @@ module MSFLVisitors
             [:filter, node.contents.map { |n| n.accept(visitor) }.reduce({}) { |hsh, x| hsh.merge!(x); hsh } ]
           when Nodes::NamedValue
             [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
+          when Nodes::Containment
+            { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
+          when Nodes::Set::Set
+            node.contents.map { |n| n.accept(visitor) }
           else
             fail "AGGREGATIONS cannot visit: #{node.class.name}"
         end

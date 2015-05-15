@@ -116,6 +116,15 @@ describe MSFLVisitors::Visitor do
       it "results in: 'lhs == [ \"item_one\", \"item_two\", \"item_three\" ]'" do
         expect(subject).to eq "lhs == [ \"item_one\" , \"item_two\" , \"item_three\" ]"
       end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: { terms: { lhs: [\"item_one\", \"item_two\", \"item_three\"] } }" do
+          expect(subject).to eq({ terms: { lhs: ["item_one", "item_two", "item_three"] } })
+        end
+      end
     end
 
     describe "a Set node" do
