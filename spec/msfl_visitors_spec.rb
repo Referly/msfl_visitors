@@ -4,11 +4,18 @@ describe MSFLVisitors do
 
   describe ".get_chewy_clauses" do
 
-    subject { described_class.get_chewy_clauses dataset, nmsfl }
+    subject { described_class.get_chewy_clauses dataset, msfl }
 
     let(:dataset) { MSFL::Datasets::Car.new }
 
-    let(:nmsfl) { { make: "Toyota" } }
+    let(:msfl) { { make: "Toyota" } }
+
+    it "converts an msfl filter into normal MSFL form" do
+      imitation_converter = double('Imitation Converter')
+      expect(imitation_converter).to receive(:run_conversions).once
+      expect(MSFL::Converters::Operator).to receive(:new).once { imitation_converter }
+      subject
+    end
 
     context "when the first argument is not a descendant of MSFL::Datasets::Base" do
 
@@ -16,6 +23,25 @@ describe MSFLVisitors do
 
       it "raises an ArgumentError" do
         expect { subject }.to raise_error ArgumentError
+      end
+    end
+
+    describe "examples from README" do
+
+      context "when the filter is { make: \"Toyota\" }" do
+
+        it 'returns: [{:clause=>"make == \"Toyota\""}]' do
+          expect(subject).to eq [{:clause=>"make == \"Toyota\""}]
+        end
+      end
+
+      context "when the filter is { partial: { given: { make: \"Toyota\" }, filter: { avg_age: 10 } } }" do
+
+        let(:msfl) { { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } } }
+
+        it "returns: [{:clause=>{partial: {terms: {make: \"Toyota\"}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]" do
+          expect(subject).to eq [{:clause=>{partial: {terms: {make: "Toyota" }, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]
+        end
       end
     end
   end

@@ -23,6 +23,24 @@ MSFLVisitors.get_chewy_clauses dataset, filter
 
 ```
 
+## Facted example
+
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+
+filter    = { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>{partial: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]
+
+```
+
 ## Architecture
 
 msfl_visitors is designed to consume normalized Mattermark Semantic Filter Language (NMSFL).
