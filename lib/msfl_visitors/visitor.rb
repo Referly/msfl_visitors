@@ -131,7 +131,8 @@ module MSFLVisitors
             node.value.iso8601
           when  Nodes::Word,
                 Nodes::Number,
-                Nodes::Boolean
+                Nodes::Boolean,
+                Nodes::Dataset
             node.value
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
@@ -156,6 +157,10 @@ module MSFLVisitors
             end
           when Nodes::And
             { and: node.set.accept(visitor) }
+
+          when Nodes::Foreign
+            { has_child: Hash[[[:type, node.left.accept(visitor)], node.right.accept(visitor)]] }
+
           else
             fail "AGGREGATIONS cannot visit: #{node.class.name}"
         end

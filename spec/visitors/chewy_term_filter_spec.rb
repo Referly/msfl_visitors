@@ -100,6 +100,15 @@ describe MSFLVisitors::Visitor do
           expect(subject).to eq "has_child( :person ).filter { age == 25 }"
         end
       end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: { has_child: { type: \"person\", filter: { term: { age: 25 } } } }" do
+          expect(subject).to eq({ has_child: { type: "person", filter: { term: { age: 25 } } } })
+        end
+      end
     end
 
     describe "a Containment node" do
