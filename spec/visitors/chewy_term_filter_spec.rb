@@ -228,8 +228,22 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::LessThan.new left, right }
 
-      it "returns: [{ clause: 'left < right' }]" do
-        expect(result).to eq [{ clause: 'lhs < "rhs"' }]
+      let(:right) { MSFLVisitors::Nodes::Number.new 133.7 }
+
+      context "when using the TermFilter visitor" do
+
+        it "returns: 'left < 133.7'" do
+          expect(result).to eq 'lhs < 133.7'
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "returns: { range: { lhs: { lt: 133.7 } } }" do
+          expect(result).to eq({ range: { lhs: { lt: 133.7 } } })
+        end
       end
     end
 
@@ -237,8 +251,22 @@ describe MSFLVisitors::Visitor do
 
       let(:node) { MSFLVisitors::Nodes::LessThanEqual.new left, right }
 
-      it "returns: [{ clause: 'left <= right' }]" do
-        expect(result).to eq [{ clause: 'lhs <= "rhs"' }]
+      let(:right) { MSFLVisitors::Nodes::Date.new Date.today }
+
+      context "when using the TermFilter visitor" do
+
+        it "returns: 'left <= \"#{Date.today}\"'" do
+          expect(result).to eq "lhs <= \"#{Date.today}\""
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "returns: { range: { lhs: { lte: \"#{Date.today}\" } } }" do
+          expect(result).to eq({ range: { lhs: { lte: "#{Date.today}" } } })
+        end
       end
     end
 

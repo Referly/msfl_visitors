@@ -50,10 +50,12 @@ module MSFLVisitors
       end
 
       BINARY_OPERATORS = {
+          Nodes::Containment            => '==',
           Nodes::GreaterThan            => '>',
           Nodes::GreaterThanEqual       => '>=',
           Nodes::Equal                  => '==',
-          Nodes::Containment            => '=='
+          Nodes::LessThan               => '<',
+          Nodes::LessThanEqual          => '<=',
       }
 
       def visit(node)
@@ -62,12 +64,16 @@ module MSFLVisitors
             node.value.to_s
           when  Nodes::Word
             "\"#{node.value}\""
+          when Nodes::Date
+            "\"#{node.value.iso8601}\""
           when  Nodes::Number
             node.value
           when  Nodes::Containment,
                 Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
-                Nodes::Equal
+                Nodes::Equal,
+                Nodes::LessThan,
+                Nodes::LessThanEqual
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
           when  Nodes::Set::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(' , ') + " ]"
@@ -89,6 +95,8 @@ module MSFLVisitors
       RANGE_OPERATORS = {
           Nodes::GreaterThan            => :gt,
           Nodes::GreaterThanEqual       => :gte,
+          Nodes::LessThan               => :lt,
+          Nodes::LessThanEqual          => :lte,
       }
 
       def visit(node)
@@ -101,9 +109,14 @@ module MSFLVisitors
             # [{ clause:  }]
           when Nodes::Field
             node.value.to_sym
+          when Nodes::Date
+            node.value.iso8601
           when Nodes::Word, Nodes::Number
             node.value
-          when Nodes::GreaterThan, Nodes::GreaterThanEqual
+          when  Nodes::GreaterThan,
+                Nodes::GreaterThanEqual,
+                Nodes::LessThan,
+                Nodes::LessThanEqual
             { range: { node.left.accept(visitor) => { RANGE_OPERATORS[node.class] =>  node.right.accept(visitor) } } }
           when Nodes::Given
             [:filter, node.contents.first.accept(visitor)]
