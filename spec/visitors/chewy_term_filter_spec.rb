@@ -14,6 +14,35 @@ describe MSFLVisitors::Visitor do
 
   context "when visiting" do
 
+    describe "an unsupported node" do
+
+      class UnsupportedNode
+
+        def accept(visitor)
+          visitor.visit self
+        end
+      end
+
+      let(:node) { UnsupportedNode.new }
+
+      context "when using the TermFilter visitor" do
+
+        it "raises an ArgumentError" do
+          expect { subject }.to raise_error ArgumentError
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "raises an ArgumentError" do
+          expect { subject }.to raise_error ArgumentError
+        end
+      end
+
+    end
+
     # chewy looks like
     # Index::Type.filter { match_all }.aggregations({toyotas: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}})
     describe "a Partial node" do

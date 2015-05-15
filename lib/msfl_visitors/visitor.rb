@@ -96,7 +96,7 @@ module MSFLVisitors
             "has_child( :#{node.value} )"
 
           else
-            fail "TERMFILTER cannot visit: #{node.class.name}"
+            fail ArgumentError, "TERMFILTER cannot visit: #{node.class.name}"
         end
       end
 
@@ -162,7 +162,7 @@ module MSFLVisitors
             { has_child: Hash[[[:type, node.left.accept(visitor)], node.right.accept(visitor)]] }
 
           else
-            fail "AGGREGATIONS cannot visit: #{node.class.name}"
+            fail ArgumentError, "AGGREGATIONS cannot visit: #{node.class.name}"
         end
       end
 
