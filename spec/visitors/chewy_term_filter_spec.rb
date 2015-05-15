@@ -314,8 +314,20 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::And.new([first])}
 
-        it "returns: the item without adding parentheses" do
-          expect(result).to eq [{ clause: 'first_field == "first_word"' }]
+        context "when using the TermFilter visitor" do
+
+          it "returns: the item without adding parentheses" do
+            expect(result).to eq 'first_field == "first_word"'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [{ term: { first_field: \"first_word\" }] }" do
+            expect(result).to eq({ and: [{ term: { first_field: "first_word" } }] })
+          end
         end
       end
 
@@ -323,8 +335,20 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::And.new([first, second]) }
 
-        it "returns: [{ clause: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" )' }]" do
-          expect(result).to eq [{ clause: '( first_field == "first_word" ) & ( second_field == "second_word" )' }]
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" )'" do
+            expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [{ term: { first_field: \"first_word\" } },{ term: { second_field: \"second_word\" } }] }" do
+            expect(result).to eq({ and: [{ term: { first_field: "first_word" }}, { term: { second_field: "second_word" } }] })
+          end
         end
       end
 
@@ -332,8 +356,20 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::And.new([first, second, third]) }
 
-        it "returns: [{ clause: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )' }]" do
-          expect(result).to eq [{ clause: '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )' }]
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( first_field == \"first_word\" ) & ( second_field == \"second_word\" ) & ( third_field == \"third_word\" )'" do
+            expect(result).to eq '( first_field == "first_word" ) & ( second_field == "second_word" ) & ( third_field == "third_word" )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [{ term: { first_field: \"first_word\" } },{ term: { second_field: \"second_word\" } },{ term: { third_field: \"third_word\" } }] }" do
+            expect(result).to eq({ and: [{ term: { first_field: "first_word" } },{ term: { second_field: "second_word" } },{ term: { third_field: "third_word" } }] })
+          end
         end
       end
 

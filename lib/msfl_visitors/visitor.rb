@@ -78,7 +78,11 @@ module MSFLVisitors
           when  Nodes::Set::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(" , ") + " ]"
           when Nodes::And
-            node.set.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
+            if node.set.count == 1
+              node.set.first.accept(visitor)
+            else
+              node.set.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
+            end
           else
             fail "TERMFILTER cannot visit: #{node.class.name}"
         end
