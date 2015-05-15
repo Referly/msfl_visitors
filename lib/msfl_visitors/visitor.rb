@@ -79,7 +79,7 @@ module MSFLVisitors
             if node.contents.count == 1
               node.contents.first.accept(visitor)
             else
-              node.contents.map { |n| "(" + n.accept(visitor) + " )" }.join(" & ")
+              node.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
             end
 
           when Nodes::And

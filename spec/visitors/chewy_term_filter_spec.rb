@@ -311,6 +311,66 @@ describe MSFLVisitors::Visitor do
       end
     end
 
+    describe "a Filter node" do
+
+      let(:node) { MSFLVisitors::Nodes::Filter.new filtered_nodes }
+
+      let(:filtered_nodes) do
+        [
+            MSFLVisitors::Nodes::GreaterThanEqual.new(
+                MSFLVisitors::Nodes::Field.new(:value),
+                MSFLVisitors::Nodes::Number.new(1000))
+        ]
+      end
+
+      context "when using the TermFilter visitor" do
+
+        it "returns: value >= 1000" do
+          expect(result).to eq "value >= 1000"
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "returns: { range: { value: { gte: 1000 } } }" do
+          expect(result).to eq({ range: { value: { gte: 1000 } } })
+        end
+      end
+
+      context "when the filter has multiple children" do
+
+        let(:filtered_nodes) do
+          [
+              MSFLVisitors::Nodes::Equal.new(
+                  MSFLVisitors::Nodes::Field.new(:make),
+                  MSFLVisitors::Nodes::Word.new("Chevy")
+              ),
+              MSFLVisitors::Nodes::GreaterThanEqual.new(
+                  MSFLVisitors::Nodes::Field.new(:value),
+                  MSFLVisitors::Nodes::Number.new(1000))
+          ]
+        end
+
+        context "when using the TermFilter visitor" do
+
+          it "returns: ( make == \"Chevy\" ) & ( value >= 1000 )" do
+            expect(result).to eq "( make == \"Chevy\" ) & ( value >= 1000 )"
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [{ term: { make: \"Chevy\" } },{ range: { value: { gte: 1000 } } }] }" do
+            expect(result).to eq({ and: [{ term: { make: "Chevy" } },{ range: { value: { gte: 1000 } } }] })
+          end
+        end
+      end
+    end
+
     describe "an And node" do
 
       let(:first_field) { MSFLVisitors::Nodes::Field.new "first_field" }
