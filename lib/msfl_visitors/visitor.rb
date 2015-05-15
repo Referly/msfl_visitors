@@ -78,10 +78,10 @@ module MSFLVisitors
           when  Nodes::Set::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(" , ") + " ]"
           when Nodes::And
-            if node.set.count == 1
-              node.set.first.accept(visitor)
+            if node.set.contents.count == 1
+              node.set.contents.first.accept(visitor)
             else
-              node.set.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
+              node.set.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
             end
           else
             fail "TERMFILTER cannot visit: #{node.class.name}"
@@ -135,7 +135,7 @@ module MSFLVisitors
           when Nodes::Set::Set
             node.contents.map { |n| n.accept(visitor) }
           when Nodes::And
-            { and: node.set.map { |n| n.accept(visitor) } }
+            { and: node.set.accept(visitor) }
           else
             fail "AGGREGATIONS cannot visit: #{node.class.name}"
         end

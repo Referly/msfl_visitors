@@ -8,9 +8,13 @@ describe MSFLVisitors::Nodes::Iterator do
 
     let(:two) { MSFLVisitors::Nodes::Number.new(2) }
 
-    let(:left) { MSFLVisitors::Nodes::Iterator.new [one, two] }
+    let(:left) { MSFLVisitors::Nodes::Iterator.new left_set }
 
-    let(:right) { MSFLVisitors::Nodes::Iterator.new [one, two] }
+    let(:left_set) { MSFLVisitors::Nodes::Set::Set.new [one, two] }
+
+    let(:right) { MSFLVisitors::Nodes::Iterator.new right_set }
+
+    let(:right_set) { MSFLVisitors::Nodes::Set::Set.new [one, two] }
 
     subject { left == right }
 
@@ -23,7 +27,7 @@ describe MSFLVisitors::Nodes::Iterator do
 
       context "when lhs#items is not equal to rhs#items" do
 
-        let(:right) {  MSFLVisitors::Nodes::Iterator.new [one] }
+        let(:right_set) { MSFLVisitors::Nodes::Set::Set.new [one] }
 
         it { is_expected.to be false }
       end

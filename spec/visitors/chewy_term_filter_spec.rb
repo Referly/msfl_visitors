@@ -290,8 +290,11 @@ describe MSFLVisitors::Visitor do
 
       let(:third) { MSFLVisitors::Nodes::Equal.new(third_field, third_value) }
 
+      let(:node) { MSFLVisitors::Nodes::And.new(set_node) }
+
       context "when the And node has zero items" do
-        let(:node) { MSFLVisitors::Nodes::And.new([]) }
+
+        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [] }
 
         context "when using the TermFilter visitor" do
 
@@ -312,7 +315,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has one item" do
 
-        let(:node) { MSFLVisitors::Nodes::And.new([first])}
+        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first] }
 
         context "when using the TermFilter visitor" do
 
@@ -333,7 +336,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has two items" do
 
-        let(:node) { MSFLVisitors::Nodes::And.new([first, second]) }
+        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first, second] }
 
         context "when using the TermFilter visitor" do
 
@@ -354,7 +357,7 @@ describe MSFLVisitors::Visitor do
 
       context "when the node has three items" do
 
-        let(:node) { MSFLVisitors::Nodes::And.new([first, second, third]) }
+        let(:set_node) { MSFLVisitors::Nodes::Set::Set.new [first, second, third] }
 
         context "when using the TermFilter visitor" do
 
