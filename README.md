@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/Referly/msfl_visitors.svg?style=svg)](https://circleci.com/gh/Referly/msfl-visitors)
+[![Circle CI](https://circleci.com/gh/Referly/msfl_visitors.svg?style=svg)](https://circleci.com/gh/Referly/msfl_visitors)
 
 # msfl_visitors
 A visitor pattern based approach for converting MSFL to other forms
@@ -10,11 +10,15 @@ require 'msfl_visitor'
 
 filter    = { make: "Toyota" }
 
+parser    = MSFLVisitors::Parsers::MSFLParser(dataset = MSFL::Dataset::Cars.new)
+
+ast       = parser.parse(filter)
+
 visitor   = MSFLVisitors::Visitor.new 
 
-visitor.visit_tree MSFLVisitors::AST.new(filter)
+visitor.visit_tree ast
 
-=> [{clause: 'make == "Toyota"'}]
+=> [{:clause=>"make == \"Toyota\""}]
 
 ```
 
