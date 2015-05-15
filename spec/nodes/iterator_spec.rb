@@ -2,6 +2,20 @@ require 'spec_helper'
 
 describe MSFLVisitors::Nodes::Iterator do
 
+  describe ".new" do
+
+    subject { described_class.new arg }
+
+    context "when the argument is not a MSFLVisitors::Nodes::Set instance" do
+
+      let(:arg) { double('Not a Set node') }
+
+      it "raises an ArgumentError" do
+        expect { subject }.to raise_error ArgumentError
+      end
+    end
+  end
+
   describe "#==" do
 
     let(:one) { MSFLVisitors::Nodes::Number.new(1) }
