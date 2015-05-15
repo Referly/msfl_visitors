@@ -1,7 +1,7 @@
-require_relative 'binary/binary'
+require_relative 'binary'
 module MSFLVisitors
   module Nodes
-    class Comparison < Binary::Binary
+    class Comparison < Binary
     end
   end
 end

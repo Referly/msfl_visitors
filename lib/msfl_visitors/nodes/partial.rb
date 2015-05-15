@@ -1,7 +1,7 @@
-require_relative 'binary/binary'
+require_relative 'binary'
 module MSFLVisitors
   module Nodes
-    class Partial < Binary::Binary
+    class Partial < Binary
     end
   end
 end

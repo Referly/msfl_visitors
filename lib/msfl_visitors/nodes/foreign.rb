@@ -1,7 +1,7 @@
-require_relative 'binary/binary'
+require_relative 'binary'
 module MSFLVisitors
   module Nodes
-    class Foreign < Binary::Binary
+    class Foreign < Binary
     end
   end
 end

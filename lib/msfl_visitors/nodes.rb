@@ -1,7 +1,7 @@
 # Using alphabetical order to keep these organized
 require_relative 'nodes/and'
 require_relative 'nodes/base'
-require_relative 'nodes/binary/binary'
+require_relative 'nodes/binary'
 require_relative 'nodes/boolean'
 require_relative 'nodes/comparison'
 require_relative 'nodes/containment'
