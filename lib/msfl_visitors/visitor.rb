@@ -53,23 +53,23 @@ module MSFLVisitors
           Nodes::GreaterThan            => '>',
           Nodes::GreaterThanEqual       => '>=',
           Nodes::Equal                  => '==',
+          Nodes::Containment            => '=='
       }
 
       def visit(node)
         case node
-          when Nodes::Field
+          when  Nodes::Field
             node.value.to_s
-          when Nodes::Word
+          when  Nodes::Word
             "\"#{node.value}\""
-          when Nodes::Number
+          when  Nodes::Number
             node.value
-          when  Nodes::GreaterThan,
+          when  Nodes::Containment,
+                Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
                 Nodes::Equal
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
-          when Nodes::Containment
-            "#{node.left.accept(visitor)} == #{node.right.accept(visitor)}"
-          when Nodes::Set::Set
+          when  Nodes::Set::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(' , ') + " ]"
           else
             fail "TERMFILTER cannot visit: #{node.class.name}"
