@@ -137,8 +137,17 @@ describe MSFLVisitors::Visitor do
 
       let(:item_two) { MSFLVisitors::Nodes::Word.new "item_two" }
 
-      it "results in: [{ clause: '[ \"item_one\", \"item_two\" ]' }]" do
-        expect(result).to eq [{ clause: "[ \"item_one\", \"item_two\" ]" }]
+      it "results in: '[ \"item_one\" , \"item_two\" ]'" do
+        expect(result).to eq "[ \"item_one\" , \"item_two\" ]"
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: [\"item_one\", \"item_two\"]" do
+          expect(result).to eq ["item_one", "item_two"]
+        end
       end
     end
 
