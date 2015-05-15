@@ -1,21 +1,22 @@
-require_relative 'set/set'
+require_relative 'base'
 module MSFLVisitors
   module Nodes
-    class Filter < Set::Set
-      # def accept(visitor)
-      #   nodes = Array.new
-      #   if contents.count > 0
-      #     contents.each do |item|
-      #       nodes << item
-      #       nodes << Set::Delimiter.new
-      #     end
-      #     # Remove the last (and therefore extra) delimiter
-      #     nodes.pop
-      #   end
-      #   nodes.each do |node|
-      #     node.accept visitor
-      #   end
-      # end
+    class Filter < Base
+      extend Forwardable
+
+      attr_accessor :contents
+
+      def_delegators :contents, :count, :first, :each
+
+      # @param nodes [Array<MSFL::Nodes::Base>] the nodes that the filter surrounds
+      def initialize(nodes)
+        self.contents = Array(nodes)
+      end
+
+      def ==(other)
+        self.class == other.class &&
+            contents == other.contents
+      end
     end
   end
 end

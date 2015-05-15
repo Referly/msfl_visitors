@@ -77,6 +77,13 @@ module MSFLVisitors
             "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{node.right.accept(visitor)}"
           when  Nodes::Set::Set
             "[ " + node.contents.map { |n| n.accept(visitor) }.join(" , ") + " ]"
+          when Nodes::Filter
+            if node.contents.count == 1
+              node.contents.first.accept(visitor)
+            else
+              node.contents.map { |n| "(" + n.accept(visitor) + " )" }.join(" & ")
+            end
+
           when Nodes::And
             if node.set.contents.count == 1
               node.set.contents.first.accept(visitor)
@@ -134,6 +141,12 @@ module MSFLVisitors
             { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
           when Nodes::Set::Set
             node.contents.map { |n| n.accept(visitor) }
+          when Nodes::Filter
+            if node.contents.count == 1
+              node.contents.first.accept visitor
+            else
+              { and: node.contents.map { |n| n.accept(visitor) } }
+            end
           when Nodes::And
             { and: node.set.accept(visitor) }
           else

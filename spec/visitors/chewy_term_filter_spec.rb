@@ -409,8 +409,21 @@ describe MSFLVisitors::Visitor do
           )
         end
 
-        it "returns: [{ clause:'( make == [ \"Honda\", \"Chevy\", \"Volvo\" ] ) & ( value >= 1000 )' }]" do
-          expect(result).to eq [{ clause: '( make == [ "Honda", "Chevy", "Volvo" ] ) & ( value >= 1000 )' }]
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( make == [ \"Honda\" , \"Chevy\" , \"Volvo\" ] ) & ( value >= 1000 )'" do
+            expect(result).to eq '( make == [ "Honda" , "Chevy" , "Volvo" ] ) & ( value >= 1000 )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: some hash" do
+            expected = { and: [{ terms: { make: ["Honda", "Chevy", "Volvo"]} }, { range: { value: { gte: 1000 } } }] }
+            expect(result).to eq expected
+          end
         end
       end
     end
