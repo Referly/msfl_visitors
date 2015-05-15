@@ -94,8 +94,11 @@ describe MSFLVisitors::Visitor do
 
       let(:right) { MSFLVisitors::Nodes::Number.new 25 }
 
-      xit "results in: [{ clause: \"age == 25\", dataset: \"person\" }]" do
-        expect(subject).to eq [{ clause: "age == 25", dataset: "person" }]
+      context "when using the TermFilter visitor" do
+
+        it "results in: 'has_child( :person ).filter { age == 25 }" do
+          expect(subject).to eq "has_child( :person ).filter { age == 25 }"
+        end
       end
     end
 

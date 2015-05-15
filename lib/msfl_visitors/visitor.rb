@@ -88,6 +88,13 @@ module MSFLVisitors
             else
               node.set.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
             end
+
+          when Nodes::Foreign
+            "#{node.left.accept visitor}.filter { #{node.right.accept visitor} }"
+
+          when Nodes::Dataset
+            "has_child( :#{node.value} )"
+
           else
             fail "TERMFILTER cannot visit: #{node.class.name}"
         end
