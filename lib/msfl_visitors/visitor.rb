@@ -15,7 +15,7 @@ module MSFLVisitors
       case node
         when Nodes::Partial
           in_aggregation_mode do
-            clauses << { clause: get_visitor.visit(node), method_to_execute: :aggregations }
+            clauses.concat get_visitor.visit(node)
             ""
           end
         else
@@ -120,10 +120,25 @@ module MSFLVisitors
       def visit(node)
         case node
           when Nodes::Partial
-            { given: Hash[[node.left.accept(visitor), node.right.accept(visitor)]] }
+            # { given: Hash[[node.left.accept(visitor), node.right.accept(visitor)]] }
+
+            # build the aggregate criteria clause first
+            # agg_criteria_clause = { clause: { agg_field_name: :portfolio_size, operator: :gt, test_value: 2 }, method_to_execute: :aggregations }
+            agg_criteria_clause = { clause: node.right.accept(visitor), method_to_execute: :aggregations }
+            # switch to the term filter mode
+            visitor.mode = :term
+            given_clause = { clause: node.left.accept(visitor) }
+
+            # switch back to the aggregations mode
+            visitor.mode = :aggregations
+            # return the result of the visitation
+            [agg_criteria_clause, given_clause]
+
+
 
           when Nodes::Equal
-            { term: { node.left.accept(visitor) => node.right.accept(visitor) } }
+            # { term: { node.left.accept(visitor) => node.right.accept(visitor) } }
+            { agg_field_name: node.left.accept(visitor), operator: :eq, test_value: node.right.accept(visitor) }
             # [{ clause:  }]
           when Nodes::Field
             node.value.to_sym
@@ -138,13 +153,16 @@ module MSFLVisitors
                 Nodes::GreaterThanEqual,
                 Nodes::LessThan,
                 Nodes::LessThanEqual
-            { range: { node.left.accept(visitor) => { RANGE_OPERATORS[node.class] =>  node.right.accept(visitor) } } }
+            { agg_field_name: node.left.accept(visitor), operator: RANGE_OPERATORS[node.class], test_value: node.right.accept(visitor) }
+            # { range: { node.left.accept(visitor) => { RANGE_OPERATORS[node.class] =>  node.right.accept(visitor) } } }
           when Nodes::Given
             [:filter, node.contents.first.accept(visitor)]
           when Nodes::ExplicitFilter
-            [:filter, node.contents.map { |n| n.accept(visitor) }.reduce({}) { |hsh, x| hsh.merge!(x); hsh } ]
+            # [:filter, node.contents.map { |n| n.accept(visitor) }.reduce({}) { |hsh, x| hsh.merge!(x); hsh } ]
+            node.contents.map { |n| n.accept(visitor) }
           when Nodes::NamedValue
-            [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
+            # [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
+            node.value.accept(visitor)
           when Nodes::Containment
             { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
           when Nodes::Set

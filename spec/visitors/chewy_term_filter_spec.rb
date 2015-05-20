@@ -483,8 +483,16 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ term: { first_field: \"first_word\" } },{ term: { second_field: \"second_word\" } },{ term: { third_field: \"third_word\" } }] }" do
-            expect(result).to eq({ and: [{ term: { first_field: "first_word" } },{ term: { second_field: "second_word" } },{ term: { third_field: "third_word" } }] })
+          it "returns: {
+              and: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: \"second_word\"},
+                    {agg_field_name: :third_field, operator: :eq, test_value: \"third_word\"}
+              ]}" do
+            expect(result).to eq({
+              and: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: "second_word"},
+                    {agg_field_name: :third_field, operator: :eq, test_value: "third_word"}
+              ]})
           end
         end
       end
@@ -533,8 +541,11 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ terms: { make: [\"Honda\",\"Chevy\",\"Volvo\"]} }, { range: { value: { gte: 1000 } } }] }" do
-            expected = { and: [{ terms: { make: ["Honda", "Chevy", "Volvo"]} }, { range: { value: { gte: 1000 } } }] }
+          it "returns: { and: [{ terms: { make: [\"Honda\",\"Chevy\",\"Volvo\"]} }, { agg_field_name: :value, operator: :gte, test_value: 1000 } }] }" do
+            expected = { and: [
+                { terms: { make: ["Honda", "Chevy", "Volvo"] } },
+                { agg_field_name: :value, operator: :gte, test_value: 1000}
+            ]}
             expect(result).to eq expected
           end
         end

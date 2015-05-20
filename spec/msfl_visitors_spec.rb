@@ -39,19 +39,19 @@ describe MSFLVisitors do
 
         let(:msfl) { { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } } }
 
-        it "returns: [{:clause=>{partial: {terms: {make: \"Toyota\"}, aggs: { filter: { range: { avg_age: { gt: 10 }}} }}}}]" do
+        it "returns: [{:clause=>[{:agg_field_name=>:avg_age, :operator=>:eq, :test_value=>10}], :method_to_execute=>:aggregations}, {:clause=>\"make == \"Toyota\"\"}]" do
+
           expect(subject).to eq [
             {
-                clause: {
-                    given: {
-                        filter: { term: { make: "Toyota"} },
-                        aggs: {
-                            partial: {
-                                filter: {
-                                    term: { avg_age: 10 }
-                                }}}}},
+                clause: [
+                    {
+                        agg_field_name: :avg_age,
+                        operator: :eq,
+                        test_value: 10
+                    }
+                ],
                 method_to_execute: :aggregations
-            }
+            }, {clause: "make == \"Toyota\""}
           ]
         end
       end
