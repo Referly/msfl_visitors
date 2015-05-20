@@ -72,21 +72,8 @@ describe MSFLVisitors::Visitor do
       subject { visitor.visit_tree node }
 
       let(:expected) do
-        [{
-             clause: {
-                 given: {
-                     filter: {
-                         term: { make: "Toyota" }
-                     },
-                     aggs: {
-                         partial: {
-                             filter: { range: { age: { gt: 10 }}}
-                         }
-                     }
-                 }
-             },
-             method_to_execute: :aggregations
-         }]
+        [{ clause: [{ agg_field_name: :age, operator: :gt, test_value: 10 }], method_to_execute: :aggregations },
+         { clause: "make == \"Toyota\"" }]
       end
 
       it "results in the appropriate aggregation clause" do
@@ -115,9 +102,9 @@ describe MSFLVisitors::Visitor do
           let(:given_value_node)        { MSFLVisitors::Nodes::Word.new "Toyota" }
 
 
-      it "results in: [:filter, { term: { make: \"Toyota\" } }]" do
+      it "results in: [:filter, { agg_field_name: :make, operator: :eq, test_value: \"Toyota\" }]" do
         visitor.mode = :aggregations
-        expect(subject).to eq([:filter, { term: { make: "Toyota" } }])
+        expect(subject).to eq([:filter, { agg_field_name: :make, operator: :eq, test_value: "Toyota" }])
       end
     end
 
