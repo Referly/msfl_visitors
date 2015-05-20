@@ -271,8 +271,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "results in: { range: { lhs: { gte: 10.52 } } }" do
-          expect(result).to eq({ range: { lhs: { gte: 10.52 } } })
+        it "results in: { agg_field_name: :lhs, operator: :gte, test_value: 10.52 }" do
+          expect(result).to eq({ agg_field_name: :lhs, operator: :gte, test_value: 10.52 })
         end
       end
     end
@@ -294,8 +294,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "returns: { range: { lhs: { lt: 133.7 } } }" do
-          expect(result).to eq({ range: { lhs: { lt: 133.7 } } })
+        it "returns: { agg_field_name: :lhs, operator: :lt, test_value: 133.7 }" do
+          expect(result).to eq({ agg_field_name: :lhs, operator: :lt, test_value: 133.7 })
         end
       end
     end
@@ -317,8 +317,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "returns: { range: { lhs: { lte: \"#{Date.today}\" } } }" do
-          expect(result).to eq({ range: { lhs: { lte: "#{Date.today}" } } })
+        it "returns: { agg_field_name: :lhs, operator: :lte, test_value: \"#{Date.today}\"}" do
+          expect(result).to eq({ agg_field_name: :lhs, operator: :lte, test_value: "#{Date.today}"})
         end
       end
     end
@@ -346,8 +346,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "returns: { range: { value: { gte: 1000 } } }" do
-          expect(result).to eq({ range: { value: { gte: 1000 } } })
+        it "returns: { agg_field_name: :value, operator: :gte, test_value: 1000 }" do
+          expect(result).to eq({ agg_field_name: :value, operator: :gte, test_value: 1000 })
         end
       end
 
@@ -376,8 +376,12 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ term: { make: \"Chevy\" } },{ range: { value: { gte: 1000 } } }] }" do
-            expect(result).to eq({ and: [{ term: { make: "Chevy" } },{ range: { value: { gte: 1000 } } }] })
+          it "returns: {
+              and: [{ agg_field_name: :make, operator: :eq, test_value: \"Chevy\" },
+                    { agg_field_name: :value, operator: :gte, test_value: 1000 }]}" do
+            expect(result).to eq({
+              and: [{ agg_field_name: :make, operator: :eq, test_value: "Chevy" },
+                    { agg_field_name: :value, operator: :gte, test_value: 1000 }]})
           end
         end
       end
@@ -441,8 +445,8 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ term: { first_field: \"first_word\" }] }" do
-            expect(result).to eq({ and: [{ term: { first_field: "first_word" } }] })
+          it "returns: { and: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" }]}" do
+            expect(result).to eq({ and: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" }]})
           end
         end
       end
@@ -462,8 +466,14 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ term: { first_field: \"first_word\" } },{ term: { second_field: \"second_word\" } }] }" do
-            expect(result).to eq({ and: [{ term: { first_field: "first_word" }}, { term: { second_field: "second_word" } }] })
+          it "returns: {
+              and: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: \"second_word\" }
+              ]}" do
+            expect(result).to eq({
+              and: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: "second_word" }
+              ]})
           end
         end
       end
