@@ -43,8 +43,6 @@ describe MSFLVisitors::Visitor do
 
     end
 
-    # chewy looks like
-    # Index::Type.filter { match_all }.aggregations({toyotas: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}})
     describe "a Partial node" do
 
       let(:node)                    { MSFLVisitors::Nodes::Partial.new given_node, named_value }
@@ -72,7 +70,7 @@ describe MSFLVisitors::Visitor do
       subject { visitor.visit_tree node }
 
       let(:expected) do
-        [{ clause: [{ agg_field_name: :age, operator: :gt, test_value: 10 }], method_to_execute: :aggregations },
+        [{ clause: { agg_field_name: :age, operator: :gt, test_value: 10 }, method_to_execute: :aggregations },
          { clause: "make == \"Toyota\"" }]
       end
 

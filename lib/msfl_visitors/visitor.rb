@@ -159,7 +159,7 @@ module MSFLVisitors
             [:filter, node.contents.first.accept(visitor)]
           when Nodes::ExplicitFilter
             # [:filter, node.contents.map { |n| n.accept(visitor) }.reduce({}) { |hsh, x| hsh.merge!(x); hsh } ]
-            node.contents.map { |n| n.accept(visitor) }
+            node.contents.map { |n| n.accept(visitor) }.first
           when Nodes::NamedValue
             # [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
             node.value.accept(visitor)
@@ -177,7 +177,7 @@ module MSFLVisitors
             { and: node.set.accept(visitor) }
 
           when Nodes::Foreign
-            { foreign: Hash[[[:type, node.left.accept(visitor)], [:filter, *node.right.accept(visitor)]]] }
+            { foreign: Hash[[[:type, node.left.accept(visitor)], [:filter, node.right.accept(visitor)]]] }
 
           else
             fail ArgumentError, "AGGREGATIONS cannot visit: #{node.class.name}"
