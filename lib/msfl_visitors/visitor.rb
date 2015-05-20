@@ -177,7 +177,7 @@ module MSFLVisitors
             { and: node.set.accept(visitor) }
 
           when Nodes::Foreign
-            { has_child: Hash[[[:type, node.left.accept(visitor)], node.right.accept(visitor)]] }
+            { foreign: Hash[[[:type, node.left.accept(visitor)], [:filter, *node.right.accept(visitor)]]] }
 
           else
             fail ArgumentError, "AGGREGATIONS cannot visit: #{node.class.name}"

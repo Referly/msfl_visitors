@@ -146,8 +146,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "results in: { has_child: { type: \"person\", filter: { term: { age: 25 } } } }" do
-          expect(subject).to eq({ has_child: { type: "person", filter: { term: { age: 25 } } } })
+        it "results in: { foreign: { type: \"person\", filter: { agg_field_name: :age, operator: :eq, test_value: 25 } } }" do
+          expect(subject).to eq({ foreign: { type: "person", filter: { agg_field_name: :age, operator: :eq, test_value: 25 } } })
         end
       end
     end
@@ -225,8 +225,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "results in: { term: { lhs: \"rhs\" } }" do
-          expect(result).to eq({ term: { lhs: "rhs" } })
+        it "results in: { agg_field_name: :lhs, operator: :eq, test_value: \"rhs\" }" do
+          expect(result).to eq({ agg_field_name: :lhs, operator: :eq, test_value: "rhs" })
         end
       end
     end
@@ -248,8 +248,8 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "results in: { range: { lhs: { gt: 1000 } } }" do
-          expect(result).to eq({ range: { lhs: { gt: 1000 } } })
+        it "results in: { agg_field_name: :lhs, operator: :gt, test_value: 1000 }" do
+          expect(result).to eq({ agg_field_name: :lhs, operator: :gt, test_value: 1000 })
         end
       end
     end
