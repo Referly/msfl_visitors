@@ -62,6 +62,41 @@ describe MSFLVisitors do
           ]
         end
       end
+
+      context "when the filter is { foreign: { dataset: 'person', filter: { gender: 'female' } } }" do
+
+        let(:msfl) { { foreign: { dataset: 'person', filter: { gender: 'female' } } } }
+
+        it "returns: [{:clause=>\"has_child( :person ).filter { gender == \"female\" }\"}]" do
+          expect(subject).to eq [{ clause: "has_child( :person ).filter { gender == \"female\" }" }]
+        end
+      end
+
+      context "when the filter is { partial: { given: { foreign: { dataset: 'person', filter: { gender: 'male' } } }, filter: { year: '2010' } } }" do
+
+        let(:msfl) { { partial: { given: { foreign: { dataset: 'person', filter: { gender: 'male' } } }, filter: { year: '2010' } } } }
+
+        it "returns [
+            {
+              clause: {
+                agg_field_name: :year,
+                operator: :eq,
+                test_value: \"2010\"
+              },
+              method_to_execute: :aggregations
+            }, {clause: \"has_child( :person ).filter { gender == \"male\" }\"}]" do
+
+          expect(subject).to eq [
+            {
+                clause: {
+                    agg_field_name: :year,
+                    operator: :eq,
+                    test_value: "2010"
+              },
+              method_to_execute: :aggregations
+            }, {clause: "has_child( :person ).filter { gender == \"male\" }"}]
+        end
+      end
     end
   end
 end
