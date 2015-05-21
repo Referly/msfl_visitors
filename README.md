@@ -41,6 +41,43 @@ MSFLVisitors.get_chewy_clauses dataset, filter
 
 ```
 
+## An example of a Foreign
+
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+
+filter    = { foreign: { dataset: 'person', filter: { gender: 'female' } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>"has_child( :person ).filter { gender == \"female\" }"}]
+
+```
+
+## An example in which a Foreign is nested in the Given of a Partial
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+# Given the set of cars where the person that is the owner is male, filter the set to only include those cars that
+# were manufactured in 2010
+filter    = { partial: { given: { foreign: { dataset: 'person', filter: { gender: 'male' } } }, filter: { year: '2010' } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>{:agg_field_name=>:year, :operator=>:eq, :test_value=>"2010"}, :method_to_execute=>:aggregations}, 
+    {:clause=>"has_child( :person ).filter { gender == \"male\" }"}]
+
+```
+
 ## Architecture
 
 msfl_visitors is designed to consume normalized Mattermark Semantic Filter Language (NMSFL).
