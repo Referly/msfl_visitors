@@ -37,7 +37,7 @@ dataset   = MSFL::Datasets::Car.new
 
 MSFLVisitors.get_chewy_clauses dataset, filter
 
-=> [{:clause=>{partial: {terms: {make: 'Toyota'}, aggregations: { filter: { range: { avg_age: { gt: 10 }}} }}}}]
+=> [{:clause=>{:agg_field_name=>:avg_age, :operator=>:eq, :test_value=>10}, :method_to_execute=>:aggregations}, {:clause=>"make == \"Toyota\""}]
 
 ```
 
