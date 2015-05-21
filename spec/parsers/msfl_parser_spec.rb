@@ -146,8 +146,9 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
         describe "parsing a partial" do
 
-          let(:filter) { { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } } }
+          let(:filter) { { partial: { given: given_filter, filter: { avg_age: 10 } } } }
 
+          let(:given_filter) { { make: "Toyota" } }
 
 
           let(:partial_node)        { MSFLVisitors::Nodes::Partial.new given_node, named_value }
@@ -173,6 +174,29 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
           it "is the expected Partial node" do
             expect(subject).to eq expected_node.call(partial_node)
+          end
+
+          context "when the partial's given clause is a foreign" do
+
+            let(:given_filter) { { foreign: { dataset: "person", filter: { gender: 'male' } } } }
+
+            let(:given_node) { MSFLVisitors::Nodes::Given.new [foreign_node] }
+
+            let(:foreign_node) { MSFLVisitors::Nodes::Foreign.new dataset_node, given_explicit_filter_node }
+
+            let(:dataset_node) { MSFLVisitors::Nodes::Dataset.new "person" }
+
+            let(:given_explicit_filter_node) { MSFLVisitors::Nodes::ExplicitFilter.new [given_exp_fil_equal_node] }
+
+            let(:given_exp_fil_equal_node) { MSFLVisitors::Nodes::Equal.new given_exp_fil_field_node, given_exp_fil_value_node }
+
+            let(:given_exp_fil_field_node) { MSFLVisitors::Nodes::Field.new :gender }
+
+            let(:given_exp_fil_value_node) { MSFLVisitors::Nodes::Word.new 'male' }
+
+            it "is the expected Partial node with a Foreign node under the Given node" do
+              expect(subject).to eq expected_node.call(partial_node)
+            end
           end
         end
       end
