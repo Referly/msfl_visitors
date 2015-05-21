@@ -90,7 +90,7 @@ module MSFLVisitors
               # Explicit Filter
               # ex { foreign: { dataset: "person", filter: { age: 25 } } }
               # ex { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } }
-              args = value.map { |k,v| hash_dispatch(k,v) }
+              args = value.map { |k,v| hash_dispatch(k,v) } # !!! THE CURRENT PROBLEM IS HERE!! need to test / update for a foreign in a partial's given
             else
               # fall back to a Filter Node
               args = [lhs, parse(value)] if lhs
