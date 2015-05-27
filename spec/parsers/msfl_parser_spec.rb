@@ -107,13 +107,6 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
         let(:containment_node) { MSFLVisitors::Nodes::Containment.new left, set_node }
 
-        # { value: { in: [50, 250, 20000] } }
-        #
-        #  => Nodes::Containment.new(Nodes::Field.new(:value),
-        #                            Nodes::Set.new([
-        #                               Nodes::Number.new(50),
-        #                               Nodes::Number.new(250),
-        #                               Nodes::Number.new(20000)]))
         it "is the expected Containment node" do
           expect(subject).to eq expected_node.call(containment_node)
         end
