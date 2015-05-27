@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'msfl_visitors'
-  s.version     = '0.1.0.rc3'
-  s.date        = '2015-05-11'
+  s.version     = '0.3.0.dev9'
+  s.date        = '2015-05-20'
   s.summary     = "Convert MSFL to other forms"
   s.description = "Visitor pattern approach to converting MSFL to other forms."
   s.authors     = ["Courtland Caldwell"]
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.homepage    =
       'https://github.com/Referly/msfl_visitors'
-  s.add_runtime_dependency "msfl", "~> 1.1", '>= 1.1.6'
+  s.add_runtime_dependency "msfl", "~> 1.2", ">=1.2.1"
   s.add_development_dependency "rake", "~> 10.3"
   s.add_development_dependency "simplecov", "~> 0.10"
   s.add_development_dependency "yard", "~> 0.8"

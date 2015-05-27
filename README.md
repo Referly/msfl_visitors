@@ -1,27 +1,82 @@
-[![Circle CI](https://circleci.com/gh/Referly/msfl_visitors.svg?style=svg)](https://circleci.com/gh/Referly/msfl-visitors)
+[![Circle CI](https://circleci.com/gh/Referly/msfl_visitors.svg?style=svg)](https://circleci.com/gh/Referly/msfl_visitors)
 
 # msfl_visitors
 A visitor pattern based approach for converting MSFL to other forms
 
 ## Usage
 
- ```ruby
- # This is not actually working code yet! @todo revisit once Matt's refactor branch is merged.
- require 'msfl_visitor'
+```ruby
+require 'msfl'
 
- filter = { make: "Toyota" }
+# Load one of the test datasets
+require 'msfl/datasets/car'
 
- collector = MSFLVisitors::Collectors::Chewy::TermFilter.new
+require 'msfl_visitors'
 
- renderer = MSFLVisitors::Renderers::Chewy::TermFilter.new
+filter    = { make: "Toyota" }
 
- visitor = MSFLVisitors::Visitor.new collector, renderer
+dataset   = MSFL::Datasets::Car.new
 
- MSFLVisitors::AST.new(filter).accept(visitor)
+MSFLVisitors.get_chewy_clauses dataset, filter
 
- => 'make == "Toyota"'
+=> [{:clause=>"make == \"Toyota\""}]
 
- ```
+```
+
+## Faceted example
+
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+
+filter    = { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>{:agg_field_name=>:avg_age, :operator=>:eq, :test_value=>10}, :method_to_execute=>:aggregations}, {:clause=>"make == \"Toyota\""}]
+
+```
+
+## An example of a Foreign
+
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+
+filter    = { foreign: { dataset: 'person', filter: { gender: 'female' } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>"has_child( :person ).filter { gender == \"female\" }"}]
+
+```
+
+## An example in which a Foreign is nested in the Given of a Partial
+```ruby
+require 'msfl'
+# Load one of the test datasets
+require 'msfl/datasets/car'
+require 'msfl_visitors'
+# Given the set of cars where the person that is the owner is male, filter the set to only include those cars that
+# were manufactured in 2010
+filter    = { partial: { given: { foreign: { dataset: 'person', filter: { gender: 'male' } } }, filter: { year: '2010' } } }
+
+dataset   = MSFL::Datasets::Car.new
+
+MSFLVisitors.get_chewy_clauses dataset, filter
+
+=> [{:clause=>{:agg_field_name=>:year, :operator=>:eq, :test_value=>"2010"}, :method_to_execute=>:aggregations}, 
+    {:clause=>"has_child( :person ).filter { gender == \"male\" }"}]
+
+```
 
 ## Architecture
 
@@ -54,13 +109,8 @@ multiple output DSLs.
 
 ## collector
 
-During traversal the output from each node needs to be stored or buffered somewhere. The collector serves this role.
-It can be as simple as a String or an Array, or it can be more elaborate. Ultimately it must respond to the shovel
-operator (<<)
-
-The gem's client should pass the appropriate collector to the Visitor constructor.
+Removed as of 0.3
 
 ## renderer
 
-The logic for rendering the AST nodes into the output DSL is codified in a renderer. The two principle renderers at
-this time are Chewy::TermFilter and Chewy:QueryStringFilter
+Removed as of 0.3

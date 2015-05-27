@@ -10,6 +10,11 @@ module MSFLVisitors
           lt:         Nodes::LessThan,
           lte:        Nodes::LessThanEqual,
           in:         Nodes::Containment,
+          foreign:    Nodes::Foreign,
+          dataset:    Nodes::Dataset,
+          filter:     Nodes::ExplicitFilter,
+          given:      Nodes::Given,
+          partial:    Nodes::Partial,
 
       }
 
@@ -29,14 +34,18 @@ module MSFLVisitors
             MSFLVisitors::Nodes::Word.new obj.to_s
 
           else
-            fail ArgumentError, "Invalid NMSFL, unable to parse."
+            fail ArgumentError, "Invalid NMSFL, unable to parse type: #{obj.class}."
         end
       end
 
 
-
+      def initialize(dataset = nil)
+        @dataset = dataset
+      end
 
     private
+
+      attr_accessor :dataset
 
       def parse_Hash(obj, lhs = false)
         nodes = Array.new
@@ -57,14 +66,36 @@ module MSFLVisitors
         obj.each do |item|
           nodes << parse(item)
         end
-        MSFLVisitors::Nodes::Set::Set.new nodes
+        MSFLVisitors::Nodes::Set.new nodes
       end
 
+      # A key/value pair needs to be parsed and handled while iterating across the Hash that the key/value pair belong to
+      # lhs is for when the field is a parent of the actual operator node
+      # ex. { year: { gte: 2010 } } needs to be converted to (gte(year, 2010)) -- infix operators to RPN
       def hash_dispatch(key, value, lhs = false)
         if OPERATORS_TO_NODE_CLASS.include? key
           # Detect the node type, forward the lhs if it was passed in (essentially when the operator is a binary op)
-          args = [lhs, parse(value)] if lhs
-          args ||= [parse(value)]
+          case key
+            when :foreign
+              args = [hash_dispatch(:dataset, value[:dataset]), hash_dispatch(:filter, value[:filter])]
+
+            when :partial
+              args = [hash_dispatch(:given, value[:given]),
+                      MSFLVisitors::Nodes::NamedValue.new(MSFLVisitors::Nodes::Word.new("partial"),
+                                                          hash_dispatch(:filter, value[:filter]))]
+
+            when :dataset
+              args = [value]
+            when :filter, :given
+              # Explicit Filter
+              # ex { foreign: { dataset: "person", filter: { age: 25 } } }
+              # ex { partial: { given: { make: "Toyota" }, filter: { avg_age: 10 } } }
+              args = value.map { |k,v| hash_dispatch(k,v) } # !!! THE CURRENT PROBLEM IS HERE!! need to test / update for a foreign in a partial's given
+            else
+              # fall back to a Filter Node
+              args = [lhs, parse(value)] if lhs
+              args ||= [parse(value)]
+          end
           OPERATORS_TO_NODE_CLASS[key].new(*args)
         else
           # the key is a field

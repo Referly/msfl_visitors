@@ -2,15 +2,33 @@ require 'spec_helper'
 
 describe MSFLVisitors::Nodes::Iterator do
 
+  describe ".new" do
+
+    subject { described_class.new arg }
+
+    context "when the argument is not a MSFLVisitors::Nodes::Set instance" do
+
+      let(:arg) { double('Not a Set node') }
+
+      it "raises an ArgumentError" do
+        expect { subject }.to raise_error ArgumentError
+      end
+    end
+  end
+
   describe "#==" do
 
     let(:one) { MSFLVisitors::Nodes::Number.new(1) }
 
     let(:two) { MSFLVisitors::Nodes::Number.new(2) }
 
-    let(:left) { MSFLVisitors::Nodes::Iterator.new [one, two] }
+    let(:left) { MSFLVisitors::Nodes::Iterator.new left_set }
 
-    let(:right) { MSFLVisitors::Nodes::Iterator.new [one, two] }
+    let(:left_set) { MSFLVisitors::Nodes::Set.new [one, two] }
+
+    let(:right) { MSFLVisitors::Nodes::Iterator.new right_set }
+
+    let(:right_set) { MSFLVisitors::Nodes::Set.new [one, two] }
 
     subject { left == right }
 
@@ -23,7 +41,7 @@ describe MSFLVisitors::Nodes::Iterator do
 
       context "when lhs#items is not equal to rhs#items" do
 
-        let(:right) {  MSFLVisitors::Nodes::Iterator.new [one] }
+        let(:right_set) { MSFLVisitors::Nodes::Set.new [one] }
 
         it { is_expected.to be false }
       end

@@ -1,8 +1,8 @@
 require_relative 'base'
-require 'forwardable'
 module MSFLVisitors
   module Nodes
-    class Filter < Base
+    class Set < Base
+
       extend Forwardable
 
       attr_accessor :contents

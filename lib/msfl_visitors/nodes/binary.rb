@@ -2,14 +2,7 @@ require_relative 'base'
 module MSFLVisitors
   module Nodes
     class Binary < Base
-
       attr_accessor :left, :right
-
-      def accept(visitor)
-        left.accept visitor
-        visitor.visit self
-        right.accept visitor
-      end
 
       def initialize(left, right)
         self.left = left
