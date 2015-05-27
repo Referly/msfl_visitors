@@ -23,7 +23,7 @@ MSFLVisitors.get_chewy_clauses dataset, filter
 
 ```
 
-## Facted example
+## Faceted example
 
 ```ruby
 require 'msfl'
