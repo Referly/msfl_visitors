@@ -162,8 +162,9 @@ describe MSFLVisitors::Visitor do
 
         before { visitor.mode = :aggregations }
 
-        it "results in: { terms: { lhs: [\"item_one\", \"item_two\", \"item_three\"] } }" do
-          expect(subject).to eq({ terms: { lhs: ["item_one", "item_two", "item_three"] } })
+        it "results in: { agg_field_name: :lhs, operator: :in, test_value: [\"item_one\", \"item_two\", \"item_three\"] }" do
+
+          expect(subject).to eq({ agg_field_name: :lhs, operator: :in, test_value: ["item_one", "item_two", "item_three"] })
         end
       end
     end
@@ -536,9 +537,9 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: { and: [{ terms: { make: [\"Honda\",\"Chevy\",\"Volvo\"]} }, { agg_field_name: :value, operator: :gte, test_value: 1000 } }] }" do
+          it "returns: { and: [{ agg_field_name: :make, operator: :in, test_value: [\"Honda\", \"Chevy\", \"Volvo\"] }, { agg_field_name: :value, operator: :gte, test_value: 1000 } }] }" do
             expected = { and: [
-                { terms: { make: ["Honda", "Chevy", "Volvo"] } },
+                { agg_field_name: :make, operator: :in, test_value: ["Honda", "Chevy", "Volvo"] },
                 { agg_field_name: :value, operator: :gte, test_value: 1000}
             ]}
             expect(result).to eq expected
