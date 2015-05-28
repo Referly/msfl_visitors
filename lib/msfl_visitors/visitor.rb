@@ -164,7 +164,7 @@ module MSFLVisitors
             # [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
             node.value.accept(visitor)
           when Nodes::Containment
-            { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
+            { agg_field_name: node.left.accept(visitor).to_sym, operator: :in, test_value: node.right.accept(visitor) }
           when Nodes::Set
             node.contents.map { |n| n.accept(visitor) }
           when Nodes::Filter
