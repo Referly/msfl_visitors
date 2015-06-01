@@ -196,9 +196,13 @@ describe MSFLVisitors::Parsers::MSFLParser do
 
       describe "parsing an and filter" do
 
-        let(:filter) { { and: set_of_values } }
+        let(:filter) { { and: MSFL::Types::Set.new([{ value: 1000 }]) } }
 
         let(:and_node) { MSFLVisitors::Nodes::And.new set_node }
+
+        let(:set_node) { MSFLVisitors::Nodes::Set.new filter_node }
+
+        let(:filter_node) { MSFLVisitors::Nodes::Filter.new(MSFLVisitors::Nodes::Equal.new left, right) }
 
         it "is the expected And node" do
           expect(subject).to eq expected_node.call(and_node)
