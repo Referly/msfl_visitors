@@ -54,18 +54,29 @@ module MSFLVisitors
           Nodes::Equal                  => '==',
           Nodes::LessThan               => '<',
           Nodes::LessThanEqual          => '<=',
+          Nodes::Match                  => '=~',
       }
 
       def visit(node)
         case node
           when  Nodes::Field
             node.value.to_s
+          when Nodes::Regex
+            "/#{node.value}/"
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
             "\"#{node.value.iso8601}\""
           when  Nodes::Number, Nodes::Boolean
             node.value
+
+          when  Nodes::Match
+            if node.right.is_a? Nodes::Set
+              regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(regex).accept(visitor)}"
+            else
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor)}"
+            end
           when  Nodes::Containment,
                 Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,

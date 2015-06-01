@@ -196,6 +196,48 @@ describe MSFLVisitors::Visitor do
       end
     end
 
+    describe "a Regex node" do
+
+      let(:node) { MSFLVisitors::Nodes::Regex.new "foobar" }
+
+      context "when using the TermFilter visitor" do
+
+        it "results in: '/foobar/'" do
+          expect(result).to eq "/foobar/"
+        end
+      end
+    end
+
+    describe "a Match node" do
+
+      let(:node) { MSFLVisitors::Nodes::Match.new left, right }
+
+      context "when using the TermFilter visitor" do
+
+        it "results in: 'left =~ /right/'" do
+          expect(result).to eq "lhs =~ /rhs/"
+        end
+      end
+
+      context "when the right hand side is a Set node containing Value nodes" do
+
+        let(:right) { MSFLVisitors::Nodes::Set.new [foo_node, bar_node, baz_node] }
+
+        let(:foo_node) { MSFLVisitors::Nodes::Word.new "foo" }
+
+        let(:bar_node) { MSFLVisitors::Nodes::Word.new "bar" }
+
+        let(:baz_node) { MSFLVisitors::Nodes::Word.new "baz" }
+
+        context "when using the TermFilter visitor" do
+
+          it "results in: 'left =~ /foo|bar|baz/'" do
+            expect(result).to eq "lhs =~ /foo|bar|baz/"
+          end
+        end
+      end
+    end
+
     describe "an Equal node" do
 
       let(:node) { MSFLVisitors::Nodes::Equal.new left, right }
