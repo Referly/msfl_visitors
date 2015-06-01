@@ -145,6 +145,15 @@ module MSFLVisitors
 
           when Nodes::Equal
             { agg_field_name: node.left.accept(visitor), operator: :eq, test_value: node.right.accept(visitor) }
+
+          when Nodes::Match
+            if node.right.is_a? Nodes::Set
+              regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
+              { agg_field_name: node.left.accept(visitor), operator: :match, test_value: MSFLVisitors::Nodes::Regex.new(regex).accept(visitor) }
+            else
+              { agg_field_name: node.left.accept(visitor), operator: :match, test_value: MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor) }
+            end
+
           when Nodes::Field
             node.value.to_sym
           when Nodes::Date, Nodes::Time
@@ -154,6 +163,9 @@ module MSFLVisitors
                 Nodes::Boolean,
                 Nodes::Dataset
             node.value
+          when  Nodes::Regex
+            node.value.to_s
+
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
                 Nodes::LessThan,

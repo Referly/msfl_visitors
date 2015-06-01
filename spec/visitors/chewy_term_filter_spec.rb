@@ -206,6 +206,15 @@ describe MSFLVisitors::Visitor do
           expect(result).to eq "/foobar/"
         end
       end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: 'foobar'" do
+          expect(result).to eq "foobar"
+        end
+      end
     end
 
     describe "a Match node" do
@@ -216,6 +225,15 @@ describe MSFLVisitors::Visitor do
 
         it "results in: 'left =~ /right/'" do
           expect(result).to eq "lhs =~ /rhs/"
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"rhs\" }" do
+          expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "rhs"})
         end
       end
 
@@ -233,6 +251,15 @@ describe MSFLVisitors::Visitor do
 
           it "results in: 'left =~ /foo|bar|baz/'" do
             expect(result).to eq "lhs =~ /foo|bar|baz/"
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"foo|bar|baz\" }" do
+            expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "foo|bar|baz"})
           end
         end
       end
