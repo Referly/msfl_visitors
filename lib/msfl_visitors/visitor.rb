@@ -12,19 +12,30 @@ module MSFLVisitors
     end
 
     def visit(node)
-      case node
-        when Nodes::Partial
-          in_aggregation_mode do
-            clauses.concat get_visitor.visit(node)
-            ""
-          end
-        else
-          get_visitor.visit(node)
+      if mode == :es_term
+        get_visitor.visit(node)
+      else
+        case node
+          when Nodes::Partial
+            in_aggregation_mode do
+              clauses.concat get_visitor.visit(node)
+              ""
+            end
+          else
+            get_visitor.visit(node)
+        end
       end
     end
 
     def get_visitor
-      (mode == :term ? TermFilterVisitor : AggregationsVisitor).new(self)
+      case mode
+        when :term
+          TermFilterVisitor.new(self)
+        when :es_term
+          ESTermFilterVisitor.new(self)
+        else
+          AggregationsVisitor.new(self)
+      end
     end
 
     def in_aggregation_mode
@@ -195,6 +206,72 @@ module MSFLVisitors
 
           else
             fail ArgumentError, "AGGREGATIONS cannot visit: #{node.class.name}"
+        end
+      end
+
+      private
+
+      attr_reader :visitor
+    end
+
+    class ESTermFilterVisitor
+      def initialize(visitor)
+        @visitor = visitor
+      end
+
+      RANGE_OPERATORS = {
+          Nodes::GreaterThan            => :gt,
+          Nodes::GreaterThanEqual       => :gte,
+          Nodes::LessThan               => :lt,
+          Nodes::LessThanEqual          => :lte,
+      }
+
+      def visit(node)
+        case node
+          when Nodes::Partial
+            { given: Hash[[node.left.accept(visitor), node.right.accept(visitor)]] }
+
+          when Nodes::Equal
+            { term: { node.left.accept(visitor) => node.right.accept(visitor) } }
+          # [{ clause:  }]
+          when Nodes::Field
+            node.value.to_sym
+          when Nodes::Date, Nodes::Time
+            node.value.iso8601
+          when  Nodes::Word,
+              Nodes::Number,
+              Nodes::Boolean,
+              Nodes::Dataset
+            node.value
+          when  Nodes::GreaterThan,
+              Nodes::GreaterThanEqual,
+              Nodes::LessThan,
+              Nodes::LessThanEqual
+            { range: { node.left.accept(visitor) => { RANGE_OPERATORS[node.class] =>  node.right.accept(visitor) } } }
+          when Nodes::Given
+            [:filter, node.contents.first.accept(visitor)]
+          when Nodes::ExplicitFilter
+            [:filter, node.contents.map { |n| n.accept(visitor) }.reduce({}) { |hsh, x| hsh.merge!(x); hsh } ]
+          when Nodes::NamedValue
+            [:aggs, {node.name.accept(visitor).to_sym => Hash[[node.value.accept(visitor)]]}]
+          when Nodes::Containment
+            { terms: {node.left.accept(visitor).to_sym => node.right.accept(visitor)} }
+          when Nodes::Set
+            node.contents.map { |n| n.accept(visitor) }
+          when Nodes::Filter
+            if node.contents.count == 1
+              node.contents.first.accept visitor
+            else
+              { and: node.contents.map { |n| n.accept(visitor) } }
+            end
+          when Nodes::And
+            { and: node.set.accept(visitor) }
+
+          when Nodes::Foreign
+            { has_child: Hash[[[:type, node.left.accept(visitor)], node.right.accept(visitor)]] }
+
+          else
+            fail ArgumentError, "ES TermFilter Visitor cannot visit: #{node.class.name}"
         end
       end
 
