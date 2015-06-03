@@ -73,7 +73,7 @@ module MSFLVisitors
           when  Nodes::Field
             node.value.to_s
           when Nodes::Regex
-            "/#{node.value}/"
+            "/#{Regexp.escape(node.value)}/"
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
@@ -83,8 +83,8 @@ module MSFLVisitors
 
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
-              regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(regex).accept(visitor)}"
+              regex = '/' + node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor)[1..-2] }.join('|') + '/'
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{regex}"
             else
               "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor)}"
             end
@@ -159,8 +159,9 @@ module MSFLVisitors
 
           when Nodes::Match
             if node.right.is_a? Nodes::Set
-              regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
-              { agg_field_name: node.left.accept(visitor), operator: :match, test_value: MSFLVisitors::Nodes::Regex.new(regex).accept(visitor) }
+              regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor) }.join('|')
+              # regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
+              { agg_field_name: node.left.accept(visitor), operator: :match, test_value: regex }
             else
               { agg_field_name: node.left.accept(visitor), operator: :match, test_value: MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor) }
             end
@@ -175,7 +176,7 @@ module MSFLVisitors
                 Nodes::Dataset
             node.value
           when  Nodes::Regex
-            node.value.to_s
+            Regexp.escape(node.value.to_s)
 
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,

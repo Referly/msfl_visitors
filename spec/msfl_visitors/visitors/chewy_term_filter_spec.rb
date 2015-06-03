@@ -702,6 +702,26 @@ describe MSFLVisitors::Visitor do
             expect(result).to eq "#{regex}"
           end
         end
+
+        context "when the regex contains characters that require escaping" do
+
+          let(:regex) { 'this / needs to % {be,escaped} *. ^[or] | \else' }
+
+          let(:node) { MSFLVisitors::Nodes::Regex.new regex }
+
+          it "returns: '/this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else/'" do
+            expect(result).to eq "/this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else/"
+          end
+
+          context "when using the Aggregations visitor" do
+
+            before { visitor.mode = :aggregations }
+
+            it "returns: 'this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else'" do
+              expect(result).to eq "this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else"
+            end
+          end
+        end
       end
     end
 
