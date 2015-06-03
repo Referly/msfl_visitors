@@ -683,6 +683,26 @@ describe MSFLVisitors::Visitor do
           end
         end
       end
+
+      describe "a Regex node" do
+
+        let(:regex) { "content" }
+
+        let(:node) { MSFLVisitors::Nodes::Regex.new regex }
+
+        it "returns: \"/content/\"" do
+          expect(result).to eq "/#{regex}/"
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: the elasticsearch regular expression formatted string \"content\"" do
+            expect(result).to eq "#{regex}"
+          end
+        end
+      end
     end
 
     describe "range value nodes" do
