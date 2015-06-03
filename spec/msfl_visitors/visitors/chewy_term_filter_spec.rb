@@ -202,8 +202,8 @@ describe MSFLVisitors::Visitor do
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'Regexp.new( \"foobar \")'" do
-          expect(result).to eq %(Regexp.new( "foobar" ))
+        it "results in: 'Regexp.new( \".*foobar.*\")'" do
+          expect(result).to eq %(Regexp.new( ".*foobar.*" ))
         end
       end
 
@@ -223,8 +223,8 @@ describe MSFLVisitors::Visitor do
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'left =~ Regexp.new( \"rhs\" )'" do
-          expect(result).to eq %(lhs =~ Regexp.new( "rhs" ))
+        it "results in: 'left =~ Regexp.new( \".*rhs.*\" )'" do
+          expect(result).to eq %(lhs =~ Regexp.new( ".*rhs.*" ))
         end
       end
 
@@ -249,8 +249,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ Regexp.new( \"foo|bar|baz\" )'" do
-            expect(result).to eq %(lhs =~ Regexp.new( "foo|bar|baz" ))
+          it "results in: 'left =~ Regexp.new( \".*foo|bar|baz.*\" )'" do
+            expect(result).to eq %(lhs =~ Regexp.new( ".*foo|bar|baz.*" ))
           end
         end
 
@@ -690,8 +690,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Regex.new regex }
 
-        it "returns: 'Regexp.new( \"content\" )'" do
-          expect(result).to eq %(Regexp.new( "#{regex}" ))
+        it "returns: 'Regexp.new( \".*content.*\" )'" do
+          expect(result).to eq %(Regexp.new( ".*#{regex}.*" ))
         end
 
         context "when using the Aggregations visitor" do
@@ -709,8 +709,8 @@ describe MSFLVisitors::Visitor do
 
           let(:node) { MSFLVisitors::Nodes::Regex.new regex }
 
-          it "returns: 'Regexp.new( \"this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else\" )'" do
-            expect(result).to eq "Regexp.new( \"this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else\" )"
+          it "returns: 'Regexp.new( \".*this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else.*\" )'" do
+            expect(result).to eq "Regexp.new( \".*this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else.*\" )"
           end
 
           context "when using the Aggregations visitor" do
