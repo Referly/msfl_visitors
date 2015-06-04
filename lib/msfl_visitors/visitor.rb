@@ -84,7 +84,7 @@ module MSFLVisitors
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
               regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor)[15..-6] }.join('|')
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} Regexp.new( \".*#{regex}.*\" )"
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} Regexp.new( '.*' + #{regex[4..-5]} + '.*' )"
             else
               "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor)}"
             end

@@ -223,8 +223,8 @@ describe MSFLVisitors::Visitor do
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'left =~ Regexp.new( \".*rhs.*\" )'" do
-          expect(result).to eq %(lhs =~ Regexp.new( ".*rhs.*" ))
+        it "results in: 'left =~ Regexp.new( '.*' + Regexp.parse( \"rhs\" ) + '.*' )'" do
+          expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "rhs" ) + '.*' ))
         end
       end
 
@@ -243,8 +243,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ Regexp.new( \".*this\\ \\(needs\\)\\ to\\ be\\*\\ escaped.*\" )'" do
-            expect(result).to eq %(lhs =~ Regexp.new( ".*this\\ \\(needs\\)\\ to\\ be\\*\\ escaped.*" ))
+          it "results in: 'left =~ Regexp.new( '.*' + Regexp.escape( \"this (needs) to be* escaped\" ) + '.*' )'" do
+            expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "this (needs) to be* escaped" ) + '.*' ))
           end
         end
 
@@ -262,8 +262,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ Regexp.new( \".*foo|bar|baz.*\" )'" do
-            expect(result).to eq %(lhs =~ Regexp.new( ".*foo|bar|baz.*" ))
+          it "results in: 'left =~ Regexp.new( '.*' + Regexp.escape( \"foo\" ) + '|' + Regexp.escape( \"bar\" ) + '|' + Regexp.escape( \"baz\" ) + '.*' )'" do
+            expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "foo" ) + '|' + Regexp.escape( "bar" ) + '|' + Regexp.escape( "baz" ) + '.*' ))
           end
         end
 
@@ -703,8 +703,8 @@ describe MSFLVisitors::Visitor do
 
         let(:node) { MSFLVisitors::Nodes::Regex.new regex }
 
-        it "returns: 'Regexp.new( \".*content.*\" )'" do
-          expect(result).to eq %(Regexp.new( ".*#{regex}.*" ))
+        it "returns: 'Regexp.new( '.*' + Regexp.escape( \"content\" ) + '.*' )'" do
+          expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "#{regex}" ) + '.*' ))
         end
 
         context "when using the Aggregations visitor" do
@@ -722,8 +722,8 @@ describe MSFLVisitors::Visitor do
 
           let(:node) { MSFLVisitors::Nodes::Regex.new regex }
 
-          it "returns: 'Regexp.new( \".*this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else.*\" )'" do
-            expect(result).to eq "Regexp.new( \".*this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else.*\" )"
+          it "returns: 'Regexp.new( '.*' + Regexp.escape( \"this / needs to % {be,escaped} *. ^[or] | \\else\" ) + '.*' )'" do
+            expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "this / needs to % {be,escaped} *. ^[or] | \\else" ) + '.*' ))
           end
 
           context "when using the Aggregations visitor" do
