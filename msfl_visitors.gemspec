@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'msfl_visitors'
-  s.version     = '1.1.0.dev0'
+  s.version     = '1.1.0'
   s.date        = '2015-05-28'
   s.summary     = "Convert MSFL to other forms"
   s.description = "Visitor pattern approach to converting MSFL to other forms."
