@@ -202,8 +202,8 @@ describe MSFLVisitors::Visitor do
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'Regexp.new( \".*foobar.*\")'" do
-          expect(result).to eq %(Regexp.new( ".*foobar.*" ))
+        it "results in: 'Regexp.new( '.*' + Regexp.escape( \"foobar\" ) + '.*' )'" do
+          expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "foobar" ) + '.*' ))
         end
       end
 
@@ -235,6 +235,19 @@ describe MSFLVisitors::Visitor do
         it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"rhs\" }" do
           expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "rhs"})
         end
+      end
+
+      context "when the right hand side is a Value node that requires escaping" do
+
+        let(:right) { MSFLVisitors::Nodes::Word.new 'this (needs) to be* escaped' }
+
+        context "when using the TermFilter visitor" do
+
+          it "results in: 'left =~ Regexp.new( \".*this\\ \\(needs\\)\\ to\\ be\\*\\ escaped.*\" )'" do
+            expect(result).to eq %(lhs =~ Regexp.new( ".*this\\ \\(needs\\)\\ to\\ be\\*\\ escaped.*" ))
+          end
+        end
+
       end
 
       context "when the right hand side is a Set node containing Value nodes" do

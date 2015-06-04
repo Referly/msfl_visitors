@@ -73,7 +73,7 @@ module MSFLVisitors
           when  Nodes::Field
             node.value.to_s
           when Nodes::Regex
-            %(Regexp.new( ".*#{Regexp.escape(node.value)}.*" ))
+            %(Regexp.new( '.*' + Regexp.escape( "#{node.value.to_s}" ) + '.*' ))
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
