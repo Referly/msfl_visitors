@@ -201,6 +201,17 @@ describe MSFLVisitors::Visitor do
         end
       end
 
+      describe "a QueryString node" do
+
+        let(:node) { MSFLVisitors::Nodes::QueryString.new left, right }
+
+        let(:right) { MSFLVisitors::Nodes::Word.new "happy" }
+
+        it %(returns: { query: { query_string: { default_field: "lhs", query: "happy" } } }) do
+          expect(result).to eq({ query: { query_string: { default_field: "lhs", query: "happy" } } })
+        end
+      end
+
       describe "a Filter node" do
 
         let(:node) { MSFLVisitors::Nodes::Filter.new filtered_nodes }

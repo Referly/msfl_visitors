@@ -391,6 +391,29 @@ describe MSFLVisitors::Visitor do
       end
     end
 
+    describe "a QueryString node" do
+
+      let(:node) { MSFLVisitors::Nodes::QueryString.new left, right }
+
+      let(:right) { MSFLVisitors::Nodes::Word.new "applesauce" }
+
+      context "when using the TermFilter visitor" do
+
+        it %(returns: 'q(query_string:{default_field:"lhs", query:"applesauce"})') do
+          expect(result).to eq %(q(query_string:{default_field:"lhs", query:"applesauce"}))
+        end
+      end
+
+      context "when using the Aggregations visitor" do
+
+        before { visitor.mode = :aggregations }
+
+        it %(returns: { agg_field_name: :lhs, operator: :query_string, test_value:"applesauce") do
+          expect(result).to eq({agg_field_name: :lhs, operator: :query_string, test_value: "applesauce"})
+        end
+      end
+    end
+
     describe "a Filter node" do
 
       let(:node) { MSFLVisitors::Nodes::Filter.new filtered_nodes }

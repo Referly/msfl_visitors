@@ -81,6 +81,9 @@ module MSFLVisitors
           when  Nodes::Number, Nodes::Boolean
             node.value
 
+          when  Nodes::QueryString
+            %(q(query_string:{default_field:"#{node.left.accept(visitor)}", query:#{node.right.accept(visitor)}}))
+
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
               regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor)[15..-6] }.join('|')
@@ -137,6 +140,8 @@ module MSFLVisitors
           Nodes::GreaterThanEqual       => :gte,
           Nodes::LessThan               => :lt,
           Nodes::LessThanEqual          => :lte,
+          Nodes::Equal                  => :eq,
+          Nodes::QueryString            => :query_string,
       }
 
       def visit(node)
@@ -153,9 +158,6 @@ module MSFLVisitors
             visitor.mode = :aggregations
             # return the result of the visitation
             [agg_criteria_clause, given_clause]
-
-          when Nodes::Equal
-            { agg_field_name: node.left.accept(visitor), operator: :eq, test_value: node.right.accept(visitor) }
 
           when Nodes::Match
             if node.right.is_a? Nodes::Set
@@ -181,7 +183,9 @@ module MSFLVisitors
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
                 Nodes::LessThan,
-                Nodes::LessThanEqual
+                Nodes::LessThanEqual,
+                Nodes::Equal,
+                Nodes::QueryString
             { agg_field_name: node.left.accept(visitor), operator: RANGE_OPERATORS[node.class], test_value: node.right.accept(visitor) }
           when Nodes::Given
             [:filter, node.contents.first.accept(visitor)]
@@ -234,7 +238,10 @@ module MSFLVisitors
 
           when Nodes::Equal
             { term: { node.left.accept(visitor) => node.right.accept(visitor) } }
-          # [{ clause:  }]
+
+          when Nodes::QueryString
+            { query: { query_string: { default_field: node.left.accept(visitor).to_s, query: node.right.accept(visitor).to_s }}}
+
           when Nodes::Field
             node.value.to_sym
           when Nodes::Date, Nodes::Time
