@@ -49,6 +49,13 @@ module MSFLVisitors
       [{clause: root.accept(self)}].concat(clauses).reject { |c| c[:clause] == "" }
     end
 
+    # Note that the ES documentation also indicates that # is a special character that requires
+    # escaping and that this behavior is not part of the PERL regex; however Ruby automatically escapes
+    # literal hashes when constructing regices
+    def escape_es_special_regex_chars(str)
+      str.gsub(/([@&<>~])/) { |m| "\\#{m}" }
+    end
+
     private
 
     attr_reader :mode
@@ -68,12 +75,19 @@ module MSFLVisitors
           Nodes::Match                  => '=~',
       }
 
+      def escaped_regex_helper(escaped_str)
+        exp = visitor.escape_es_special_regex_chars "#{escaped_str}"
+        # why you must use #inspect, not #to_s. @link http://ruby-doc.org/core-1.9.3/Regexp.html#method-i-3D-7E
+        %r[.*#{exp}.*]
+      end
+
       def visit(node)
         case node
           when  Nodes::Field
             node.value.to_s
           when Nodes::Regex
-            %(Regexp.new( '.*' + Regexp.escape( "#{node.value.to_s}" ) + '.*' ))
+            esc = Regexp.escape("#{node.value.to_s}")
+            escaped_regex_helper esc
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
@@ -86,10 +100,10 @@ module MSFLVisitors
 
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
-              regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor)[15..-6] }.join('|')
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} Regexp.new( '.*' + #{regex[4..-5]} + '.*' )"
+              escaped_str = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor).inspect[3..-4] }.join('|')
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + escaped_regex_helper(escaped_str).inspect
             else
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor)}"
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor).inspect
             end
           when  Nodes::Containment,
                 Nodes::GreaterThan,

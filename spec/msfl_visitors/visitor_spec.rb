@@ -11,4 +11,20 @@ describe MSFLVisitors::Visitor do
       expect(subject.send(:mode)).to eq :term
     end
   end
+
+  describe "#escape_es_special_regex_chars" do
+
+    {
+        'ab@cd' => 'ab\@cd',
+        'ab&cd' => 'ab\&cd',
+        'ab<cd' => 'ab\<cd',
+        'ab>cd' => 'ab\>cd',
+        'ab~cd' => 'ab\~cd',
+    }.each do |str, expected|
+
+      it "escapes '#{str}' as '#{expected}'" do
+        expect(MSFLVisitors::Visitor.new.escape_es_special_regex_chars str).to eq expected
+      end
+    end
+  end
 end

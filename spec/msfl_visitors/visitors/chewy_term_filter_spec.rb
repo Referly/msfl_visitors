@@ -198,12 +198,23 @@ describe MSFLVisitors::Visitor do
 
     describe "a Regex node" do
 
-      let(:node) { MSFLVisitors::Nodes::Regex.new "foobar" }
+      let(:node) { MSFLVisitors::Nodes::Regex.new regex }
+
+      let(:regex) { "foobar" }
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'Regexp.new( '.*' + Regexp.escape( \"foobar\" ) + '.*' )'" do
-          expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "foobar" ) + '.*' ))
+        it "results in: /.*foobar.*/" do
+          expect(result).to eq /.*foobar.*/
+        end
+
+        context "when the node requires escaping" do
+
+          let(:node) { MSFLVisitors::Nodes::Regex.new "foo*bar" }
+
+          it "results in: #{/.*foo\*bar.*/.inspect}" do
+            expect(result).to eq /.*foo\*bar.*/
+          end
         end
       end
 
@@ -215,6 +226,36 @@ describe MSFLVisitors::Visitor do
           expect(result).to eq "foobar"
         end
       end
+
+      context "when the expression contains `#`, `@`, `&`, `<`, `>`, or `~`" do
+
+        let(:regex) { "a #sentence@ contain&ing <lucene> cha~rs" }
+
+        it "escapes lucene specific special characters" do
+          expected =  /.*a\ \#sentence\@\ contain\&ing\ \<lucene\>\ cha\~rs.*/
+          expect(result).to eq expected
+        end
+      end
+
+      context "when the regex contains characters that require escaping" do
+
+        let(:regex) { 'this / needs to % {be,escaped} *. ^[or] | \else' }
+
+        let(:node) { MSFLVisitors::Nodes::Regex.new regex }
+
+        it "returns: #{/.*this\ \/\ needs\ to\ %\ \{be,escaped\}\ \*\.\ \^\[or\]\ \|\ \\else.*/.inspect}" do
+          expect(result).to eq /.*this\ \/\ needs\ to\ %\ \{be,escaped\}\ \*\.\ \^\[or\]\ \|\ \\else.*/
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: 'this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else'" do
+            expect(result).to eq "this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else"
+          end
+        end
+      end
     end
 
     describe "a Match node" do
@@ -223,8 +264,8 @@ describe MSFLVisitors::Visitor do
 
       context "when using the TermFilter visitor" do
 
-        it "results in: 'left =~ Regexp.new( '.*' + Regexp.parse( \"rhs\" ) + '.*' )'" do
-          expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "rhs" ) + '.*' ))
+        it "results in: 'left =~ /.*rhs.*/'" do
+          expect(result).to eq %(lhs =~ /.*rhs.*/)
         end
       end
 
@@ -243,8 +284,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ Regexp.new( '.*' + Regexp.escape( \"this (needs) to be* escaped\" ) + '.*' )'" do
-            expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "this (needs) to be* escaped" ) + '.*' ))
+          it "results in: 'left =~ /.*this\ \(needs\)\ to\ be\*\ escaped.*/'" do
+            expect(result).to eq %(lhs =~ ) + /.*this\ \(needs\)\ to\ be\*\ escaped.*/.inspect
           end
         end
 
@@ -262,8 +303,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ Regexp.new( '.*' + Regexp.escape( \"foo\" ) + '|' + Regexp.escape( \"bar\" ) + '|' + Regexp.escape( \"baz\" ) + '.*' )'" do
-            expect(result).to eq %(lhs =~ Regexp.new( '.*' + Regexp.escape( "foo" ) + '|' + Regexp.escape( "bar" ) + '|' + Regexp.escape( "baz" ) + '.*' ))
+          it "results in: 'left =~ /.*foo|bar|baz.*/'" do
+            expect(result).to eq %(lhs =~ ) + /.*foo|bar|baz.*/.inspect
           end
         end
 
@@ -716,46 +757,6 @@ describe MSFLVisitors::Visitor do
 
           it "returns: the literal string" do
             expect(result).to eq "#{word}"
-          end
-        end
-      end
-
-      describe "a Regex node" do
-
-        let(:regex) { "content" }
-
-        let(:node) { MSFLVisitors::Nodes::Regex.new regex }
-
-        it "returns: 'Regexp.new( '.*' + Regexp.escape( \"content\" ) + '.*' )'" do
-          expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "#{regex}" ) + '.*' ))
-        end
-
-        context "when using the Aggregations visitor" do
-
-          before { visitor.mode = :aggregations }
-
-          it "returns: the elasticsearch regular expression formatted string \"content\"" do
-            expect(result).to eq "#{regex}"
-          end
-        end
-
-        context "when the regex contains characters that require escaping" do
-
-          let(:regex) { 'this / needs to % {be,escaped} *. ^[or] | \else' }
-
-          let(:node) { MSFLVisitors::Nodes::Regex.new regex }
-
-          it "returns: 'Regexp.new( '.*' + Regexp.escape( \"this / needs to % {be,escaped} *. ^[or] | \\else\" ) + '.*' )'" do
-            expect(result).to eq %(Regexp.new( '.*' + Regexp.escape( "this / needs to % {be,escaped} *. ^[or] | \\else" ) + '.*' ))
-          end
-
-          context "when using the Aggregations visitor" do
-
-            before { visitor.mode = :aggregations }
-
-            it "returns: 'this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else'" do
-              expect(result).to eq "this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else"
-            end
           end
         end
       end
