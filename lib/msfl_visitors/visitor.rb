@@ -9,8 +9,9 @@ module MSFLVisitors
       str.gsub(/([@&<>~])/) { |m| "\\#{m}" }
     end
 
-    def escaped_regex_helper(escaped_str)
-      exp = escape_es_special_regex_chars "#{escaped_str}"
+    def regex_escape(escaped_str)
+      esc = Regexp.escape("#{escaped_str.to_s}")
+      exp = escape_es_special_regex_chars "#{esc}"
       # why you must use #inspect, not #to_s. @link http://ruby-doc.org/core-1.9.3/Regexp.html#method-i-3D-7E
       %r[.*#{exp}.*]
     end
@@ -97,8 +98,7 @@ module MSFLVisitors
           when  Nodes::Field
             node.value.to_s
           when Nodes::Regex
-            esc = Regexp.escape("#{node.value.to_s}")
-            escaped_regex_helper esc
+            regex_escape node.value.to_s
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
@@ -205,8 +205,7 @@ module MSFLVisitors
                 Nodes::Dataset
             node.value
           when  Nodes::Regex
-            esc = Regexp.escape("#{node.value.to_s}")
-            composable_expr_for(escaped_regex_helper(esc).inspect)
+            composable_expr_for(regex_escape(node.value.to_s).inspect)
 
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
