@@ -1,5 +1,26 @@
 require 'forwardable'
 module MSFLVisitors
+
+  module VisitorHelpers
+    # Note that the ES documentation also indicates that # is a special character that requires
+    # escaping and that this behavior is not part of the PERL regex; however Ruby automatically escapes
+    # literal hashes when constructing regices
+    def escape_es_special_regex_chars(str)
+      str.gsub(/([@&<>~])/) { |m| "\\#{m}" }
+    end
+
+    def regex_escape(escaped_str)
+      esc = Regexp.escape("#{escaped_str.to_s}")
+      exp = escape_es_special_regex_chars "#{esc}"
+      # why you must use #inspect, not #to_s. @link http://ruby-doc.org/core-1.9.3/Regexp.html#method-i-3D-7E
+      %r[.*#{exp}.*]
+    end
+
+    def composable_expr_for(regex_as_literal_string)
+      regex_as_literal_string[3..-4]
+    end
+  end
+
   class Visitor
 
     attr_accessor :clauses, :current_clause
@@ -54,6 +75,8 @@ module MSFLVisitors
     attr_reader :mode
 
     class TermFilterVisitor
+      include VisitorHelpers
+
       def initialize(visitor)
         @visitor = visitor
       end
@@ -68,12 +91,14 @@ module MSFLVisitors
           Nodes::Match                  => '=~',
       }
 
+
+
       def visit(node)
         case node
           when  Nodes::Field
             node.value.to_s
           when Nodes::Regex
-            %(Regexp.new( '.*' + Regexp.escape( "#{node.value.to_s}" ) + '.*' ))
+            regex_escape node.value.to_s
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
@@ -86,10 +111,11 @@ module MSFLVisitors
 
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
-              regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor)[15..-6] }.join('|')
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} Regexp.new( '.*' + #{regex[4..-5]} + '.*' )"
+              escaped_str_frags = node.right.contents.map { |right_child| composable_expr_for(MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor).inspect) }
+              escaped_str = escaped_str_frags.join('|')
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + %r[.*#{escaped_str}.*].inspect
             else
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} #{MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor)}"
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor).inspect
             end
           when  Nodes::Containment,
                 Nodes::GreaterThan,
@@ -131,6 +157,7 @@ module MSFLVisitors
     end
 
     class AggregationsVisitor
+      include VisitorHelpers
       def initialize(visitor)
         @visitor = visitor
       end
@@ -178,7 +205,7 @@ module MSFLVisitors
                 Nodes::Dataset
             node.value
           when  Nodes::Regex
-            Regexp.escape(node.value.to_s)
+            composable_expr_for(regex_escape(node.value.to_s).inspect)
 
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
