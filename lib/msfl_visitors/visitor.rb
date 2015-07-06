@@ -101,7 +101,7 @@ module MSFLVisitors
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
               escaped_str = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor).inspect[3..-4] }.join('|')
-              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + escaped_regex_helper(escaped_str).inspect
+              "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + %r[.*#{escaped_str}.*].inspect
             else
               "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor).inspect
             end

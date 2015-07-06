@@ -280,12 +280,12 @@ describe MSFLVisitors::Visitor do
 
       context "when the right hand side is a Value node that requires escaping" do
 
-        let(:right) { MSFLVisitors::Nodes::Word.new 'this (needs) to be* escaped' }
+        let(:right) { MSFLVisitors::Nodes::Word.new 'this (ne&eds) to be* escaped' }
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ /.*this\ \(needs\)\ to\ be\*\ escaped.*/'" do
-            expect(result).to eq %(lhs =~ ) + /.*this\ \(needs\)\ to\ be\*\ escaped.*/.inspect
+          it "results in: 'left =~ /.*this\ \(ne\&eds\)\ to\ be\*\ escaped.*/'" do
+            expect(result).to eq %(lhs =~ ) + /.*this\ \(ne\&eds\)\ to\ be\*\ escaped.*/.inspect
           end
         end
 
@@ -305,6 +305,15 @@ describe MSFLVisitors::Visitor do
 
           it "results in: 'left =~ /.*foo|bar|baz.*/'" do
             expect(result).to eq %(lhs =~ ) + /.*foo|bar|baz.*/.inspect
+          end
+
+          context "when one of the members of the Set requires escaping" do
+
+            let(:foo_node) { MSFLVisitors::Nodes::Word.new "please&*escape me" }
+
+            it "escapes special characters" do
+              expect(result).to eq %(lhs =~ ) + /.*please\&\*escape\ me|bar|baz.*/.inspect
+            end
           end
         end
 
