@@ -298,6 +298,15 @@ describe MSFLVisitors::Visitor do
           end
         end
 
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it %(results in: { agg_field_name: :lhs, operator: :match, test_value: "this\\ \\(ne\\&eds\\)\\ to\\ be\\*\\ escaped" }) do
+            expected = { agg_field_name: :lhs, operator: :match, test_value: "this\\ \\(ne\\&eds\\)\\ to\\ be\\*\\ escaped" }
+            expect(result).to eq expected
+          end
+        end
       end
 
       context "when the right hand side is a Set node containing Value nodes" do
@@ -332,6 +341,15 @@ describe MSFLVisitors::Visitor do
 
           it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"foo|bar|baz\" }" do
             expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "foo|bar|baz"})
+          end
+
+          context "when one of the members of the Set requires escaping" do
+
+            let(:foo_node) { MSFLVisitors::Nodes::Word.new "please&*escape me" }
+
+            it "results in { agg_field_name: :lhs, operator: :match, test_value: \"please\\&\\*escape\\ me }" do
+              expected = { agg_field_name: :lhs, operator: :match, test_value: "please\\&\\*escape\\ me" }
+            end
           end
         end
       end
