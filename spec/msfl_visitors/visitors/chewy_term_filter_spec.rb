@@ -235,6 +235,15 @@ describe MSFLVisitors::Visitor do
           expected =  /.*a\ \#sentence\@\ contain\&ing\ \<lucene\>\ cha\~rs.*/
           expect(result).to eq expected
         end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "escapes lucene specific special characters" do
+            expect(result).to eq "a\\ \\#sentence\\@\\ contain\\&ing\\ \\<lucene\\>\\ cha\\~rs"
+          end
+        end
       end
 
       context "when the regex contains characters that require escaping" do
@@ -251,8 +260,8 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "returns: 'this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else'" do
-            expect(result).to eq "this\\ /\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else"
+          it "returns: 'this\\ \\/\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else'" do
+            expect(result).to eq "this\\ \\/\\ needs\\ to\\ %\\ \\{be,escaped\\}\\ \\*\\.\\ \\^\\[or\\]\\ \\|\\ \\\\else"
           end
         end
       end

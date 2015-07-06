@@ -56,6 +56,12 @@ module MSFLVisitors
       str.gsub(/([@&<>~])/) { |m| "\\#{m}" }
     end
 
+    def escaped_regex_helper(escaped_str)
+      exp = escape_es_special_regex_chars "#{escaped_str}"
+      # why you must use #inspect, not #to_s. @link http://ruby-doc.org/core-1.9.3/Regexp.html#method-i-3D-7E
+      %r[.*#{exp}.*]
+    end
+
     private
 
     attr_reader :mode
@@ -75,11 +81,7 @@ module MSFLVisitors
           Nodes::Match                  => '=~',
       }
 
-      def escaped_regex_helper(escaped_str)
-        exp = visitor.escape_es_special_regex_chars "#{escaped_str}"
-        # why you must use #inspect, not #to_s. @link http://ruby-doc.org/core-1.9.3/Regexp.html#method-i-3D-7E
-        %r[.*#{exp}.*]
-      end
+
 
       def visit(node)
         case node
@@ -87,7 +89,7 @@ module MSFLVisitors
             node.value.to_s
           when Nodes::Regex
             esc = Regexp.escape("#{node.value.to_s}")
-            escaped_regex_helper esc
+            visitor.escaped_regex_helper esc
           when  Nodes::Word
             "\"#{node.value}\""
           when Nodes::Date, Nodes::Time
@@ -192,7 +194,8 @@ module MSFLVisitors
                 Nodes::Dataset
             node.value
           when  Nodes::Regex
-            Regexp.escape(node.value.to_s)
+            esc = Regexp.escape("#{node.value.to_s}")
+            visitor.escaped_regex_helper(esc).inspect[3..-4]
 
           when  Nodes::GreaterThan,
                 Nodes::GreaterThanEqual,
