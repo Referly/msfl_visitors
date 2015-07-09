@@ -112,7 +112,7 @@ module MSFLVisitors
           when  Nodes::Match
             if node.right.is_a? Nodes::Set
               escaped_str_frags = node.right.contents.map { |right_child| composable_expr_for(MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor).inspect) }
-              escaped_str = escaped_str_frags.join('|')
+              escaped_str = "(" + escaped_str_frags.join('|') + ")"
               "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + %r[.*#{escaped_str}.*].inspect
             else
               "#{node.left.accept(visitor)} #{BINARY_OPERATORS[node.class]} " + MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor).inspect
@@ -188,8 +188,7 @@ module MSFLVisitors
 
           when Nodes::Match
             if node.right.is_a? Nodes::Set
-              regex = node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor) }.join('|')
-              # regex = node.right.contents.map { |right_child| right_child.value.to_s }.join('|')
+              regex = "(" + node.right.contents.map { |right_child| MSFLVisitors::Nodes::Regex.new(right_child.value.to_s).accept(visitor) }.join('|') + ")"
               { agg_field_name: node.left.accept(visitor), operator: :match, test_value: regex }
             else
               { agg_field_name: node.left.accept(visitor), operator: :match, test_value: MSFLVisitors::Nodes::Regex.new(node.right.value.to_s).accept(visitor) }
@@ -246,6 +245,7 @@ module MSFLVisitors
       attr_reader :visitor
     end
 
+    # ESTermFilterVisitor is not currently used and so not all node types are implemented
     class ESTermFilterVisitor
       def initialize(visitor)
         @visitor = visitor
