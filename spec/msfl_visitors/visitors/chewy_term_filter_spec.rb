@@ -321,8 +321,8 @@ describe MSFLVisitors::Visitor do
 
         context "when using the TermFilter visitor" do
 
-          it "results in: 'left =~ /.*foo|bar|baz.*/'" do
-            expect(result).to eq %(lhs =~ ) + /.*foo|bar|baz.*/.inspect
+          it "results in: 'left =~ /.*(foo|bar|baz).*/'" do
+            expect(result).to eq %(lhs =~ ) + /.*(foo|bar|baz).*/.inspect
           end
 
           context "when one of the members of the Set requires escaping" do
@@ -330,7 +330,7 @@ describe MSFLVisitors::Visitor do
             let(:foo_node) { MSFLVisitors::Nodes::Word.new "please&*escape me" }
 
             it "escapes special characters" do
-              expect(result).to eq %(lhs =~ ) + /.*please\&\*escape\ me|bar|baz.*/.inspect
+              expect(result).to eq %(lhs =~ ) + /.*(please\&\*escape\ me|bar|baz).*/.inspect
             end
           end
         end
@@ -339,16 +339,17 @@ describe MSFLVisitors::Visitor do
 
           before { visitor.mode = :aggregations }
 
-          it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"foo|bar|baz\" }" do
-            expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "foo|bar|baz"})
+          it "results in: { agg_field_name: :lhs, operator: :match, test_value: \"(foo|bar|baz)\" }" do
+            expect(result).to eq({agg_field_name: :lhs, operator: :match, test_value: "(foo|bar|baz)"})
           end
 
           context "when one of the members of the Set requires escaping" do
 
             let(:foo_node) { MSFLVisitors::Nodes::Word.new "please&*escape me" }
 
-            it "results in { agg_field_name: :lhs, operator: :match, test_value: \"please\\&\\*escape\\ me }" do
-              expected = { agg_field_name: :lhs, operator: :match, test_value: "please\\&\\*escape\\ me" }
+            it "results in { agg_field_name: :lhs, operator: :match, test_value: \"(please\\&\\*escape\\ me|bar|baz) }" do
+              expected = { agg_field_name: :lhs, operator: :match, test_value: "(please\\&\\*escape\\ me|bar|baz)" }
+              expect(result).to eq expected
             end
           end
         end
