@@ -6,4 +6,9 @@ machine:
   # Version of ruby to use
   ruby:
     version:
-      2.1.3
+      2.1.9
+
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/rspec
+    - bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml spec --format progress
