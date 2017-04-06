@@ -731,6 +731,181 @@ describe MSFLVisitors::Visitor do
       end
     end
 
+    describe "an Or node" do
+
+      let(:first_field) { MSFLVisitors::Nodes::Field.new "first_field" }
+
+      let(:first_value) { MSFLVisitors::Nodes::Word.new "first_word" }
+
+      let(:first) { MSFLVisitors::Nodes::Equal.new first_field, first_value }
+
+      let(:second_field) { MSFLVisitors::Nodes::Field.new "second_field" }
+
+      let(:second_value) { MSFLVisitors::Nodes::Word.new "second_word" }
+
+      let(:second) { MSFLVisitors::Nodes::Equal.new second_field, second_value }
+
+      let(:third_field) { MSFLVisitors::Nodes::Field.new "third_field" }
+
+      let(:third_value) { MSFLVisitors::Nodes::Word.new "third_word" }
+
+      let(:third) { MSFLVisitors::Nodes::Equal.new third_field, third_value }
+
+      let(:node) { MSFLVisitors::Nodes::Or.new set_node }
+
+      context "when the Or node has zero items" do
+
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [] }
+
+        context "when using the TermFilter visitor" do
+
+          it "is empty" do
+            expect(result).to be_empty
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { and: [] }" do
+            expect(result).to eq({ or: [] })
+          end
+        end
+      end
+
+      context "when the node has one item" do
+
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first] }
+
+        context "when using the TermFilter visitor" do
+
+          it "returns: the item without adding parentheses" do
+            expect(result).to eq 'first_field == "first_word"'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { or: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" }]}" do
+            expect(result).to eq({ or: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" }]})
+          end
+        end
+      end
+
+      context "when the node has two items" do
+
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first, second] }
+
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( first_field == \"first_word\" ) | ( second_field == \"second_word\" )'" do
+            expect(result).to eq '( first_field == "first_word" ) | ( second_field == "second_word" )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: {
+              or: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: \"second_word\" }
+              ]}" do
+            expect(result).to eq({
+                                     or: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" },
+                                           { agg_field_name: :second_field, operator: :eq, test_value: "second_word" }
+                                     ]})
+          end
+        end
+      end
+
+      context "when the node has three items" do
+
+        let(:set_node) { MSFLVisitors::Nodes::Set.new [first, second, third] }
+
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( first_field == \"first_word\" ) | ( second_field == \"second_word\" ) | ( third_field == \"third_word\" )'" do
+            expect(result).to eq '( first_field == "first_word" ) | ( second_field == "second_word" ) | ( third_field == "third_word" )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: {
+              or: [{ agg_field_name: :first_field, operator: :eq, test_value: \"first_word\" },
+                    { agg_field_name: :second_field, operator: :eq, test_value: \"second_word\"},
+                    {agg_field_name: :third_field, operator: :eq, test_value: \"third_word\"}
+              ]}" do
+            expect(result).to eq({
+                                     or: [{ agg_field_name: :first_field, operator: :eq, test_value: "first_word" },
+                                           { agg_field_name: :second_field, operator: :eq, test_value: "second_word"},
+                                           {agg_field_name: :third_field, operator: :eq, test_value: "third_word"}
+                                     ]})
+          end
+        end
+      end
+
+      context "when one of the node's items is a containment node" do
+
+        let(:node) do
+          MSFLVisitors::Nodes::Or.new(
+              MSFLVisitors::Nodes::Set.new(
+                  [
+                      MSFLVisitors::Nodes::Filter.new(
+                          [
+                              MSFLVisitors::Nodes::Containment.new(
+                                  MSFLVisitors::Nodes::Field.new(:make),
+                                  MSFLVisitors::Nodes::Set.new(
+                                      [
+                                          MSFLVisitors::Nodes::Word.new("Honda"),
+                                          MSFLVisitors::Nodes::Word.new("Chevy"),
+                                          MSFLVisitors::Nodes::Word.new("Volvo")
+                                      ]
+                                  )
+                              )
+                          ]
+                      ),
+                      MSFLVisitors::Nodes::Filter.new(
+                          [
+                              MSFLVisitors::Nodes::GreaterThanEqual.new(
+                                  MSFLVisitors::Nodes::Field.new(:value),
+                                  MSFLVisitors::Nodes::Number.new(1000)
+                              )
+                          ]
+                      )
+                  ]
+              )
+          )
+        end
+
+        context "when using the TermFilter visitor" do
+
+          it "returns: '( make == [ \"Honda\" , \"Chevy\" , \"Volvo\" ] ) | ( value >= 1000 )'" do
+            expect(result).to eq '( make == [ "Honda" , "Chevy" , "Volvo" ] ) | ( value >= 1000 )'
+          end
+        end
+
+        context "when using the Aggregations visitor" do
+
+          before { visitor.mode = :aggregations }
+
+          it "returns: { or: [{ agg_field_name: :make, operator: :in, test_value: [\"Honda\", \"Chevy\", \"Volvo\"] }, { agg_field_name: :value, operator: :gte, test_value: 1000 } }] }" do
+            expected = { or: [
+                { agg_field_name: :make, operator: :in, test_value: ["Honda", "Chevy", "Volvo"] },
+                { agg_field_name: :value, operator: :gte, test_value: 1000}
+            ]}
+            expect(result).to eq expected
+          end
+        end
+      end
+    end
+
     describe "value nodes" do
       describe "a Boolean node" do
 

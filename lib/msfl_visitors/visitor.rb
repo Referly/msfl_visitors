@@ -91,7 +91,10 @@ module MSFLVisitors
           Nodes::Match                  => '=~',
       }
 
-
+      ITERATOR_OPERATORS = {
+          Nodes::And  => "&",
+          Nodes::Or   => "|"
+      }
 
       def visit(node)
         case node
@@ -133,11 +136,11 @@ module MSFLVisitors
               node.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
             end
 
-          when Nodes::And
+          when Nodes::Iterator
             if node.set.contents.count == 1
               node.set.contents.first.accept(visitor)
             else
-              node.set.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" & ")
+              node.set.contents.map { |n| "( " + n.accept(visitor) + " )" }.join(" #{ITERATOR_OPERATORS[node.class]} ")
             end
 
           when Nodes::Foreign
@@ -169,6 +172,11 @@ module MSFLVisitors
           Nodes::LessThanEqual          => :lte,
           Nodes::Equal                  => :eq,
           Nodes::QueryString            => :query_string,
+      }
+
+      ITERATOR_OPERATORS = {
+          Nodes::And => :and,
+          Nodes::Or => :or,
       }
 
       def visit(node)
@@ -229,8 +237,8 @@ module MSFLVisitors
             else
               { and: node.contents.map { |n| n.accept(visitor) } }
             end
-          when Nodes::And
-            { and: node.set.accept(visitor) }
+          when Nodes::Iterator
+            { ITERATOR_OPERATORS[node.class] => node.set.accept(visitor) }
 
           when Nodes::Foreign
             { foreign: Hash[[[:type, node.left.accept(visitor)], [:filter, node.right.accept(visitor)]]] }

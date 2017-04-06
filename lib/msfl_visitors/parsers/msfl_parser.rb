@@ -4,6 +4,7 @@ module MSFLVisitors
     class MSFLParser
       OPERATORS_TO_NODE_CLASS = {
           and:        Nodes::And,
+          or:         Nodes::Or,
           gt:         Nodes::GreaterThan,
           gte:        Nodes::GreaterThanEqual,
           eq:         Nodes::Equal,
@@ -25,10 +26,10 @@ module MSFLVisitors
             MSFLVisitors::Nodes::Number.new obj
 
           when Hash
-            parse_Hash obj, lhs
+            parse_hash obj, lhs
 
           when MSFL::Types::Set
-            parse_Set obj, lhs
+            parse_set obj, lhs
 
           when Symbol, String, NilClass
             MSFLVisitors::Nodes::Word.new obj.to_s
@@ -47,7 +48,7 @@ module MSFLVisitors
 
       attr_accessor :dataset
 
-      def parse_Hash(obj, lhs = false)
+      def parse_hash(obj, lhs = false)
         nodes = Array.new
         obj.each do |k, v|
           nodes << hash_dispatch(k, v, lhs)
@@ -61,7 +62,7 @@ module MSFLVisitors
         end
       end
 
-      def parse_Set(obj, lhs = false)
+      def parse_set(obj, lhs = false)
         nodes = MSFL::Types::Set.new([])
         obj.each do |item|
           nodes << parse(item)
